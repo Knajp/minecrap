@@ -55,32 +55,39 @@ public:
         int ChunkX = static_cast<int>(floor(m_Position.x / CHUNK_SIZE));
         int ChunkZ = static_cast<int>(floor(m_Position.z / CHUNK_SIZE));
         int xinchunk = int(m_Position.x) - ChunkX * CHUNK_SIZE;
-        int zinchunk = int(m_Position.z) - ChunkZ * CHUNK_SIZE - 1;
+        int zinchunk = int(m_Position.z) - ChunkZ * CHUNK_SIZE;
 
         ChunkData* data = planet->getChunkData({ ChunkX, ChunkZ });
 
-        int blockHeight = 0;
+
+        int blockbelow = 0;
+
         for (int i = 255; i >= 0; i--)
         {
-            if (data->GetBlock(xinchunk, i, zinchunk) != AIR && std::find(billboards.begin(), billboards.end(), data->GetBlock(xinchunk, i, zinchunk)) == billboards.end())
-            {
-                blockHeight = i + 1 - 128;
-                break;
-            }
-        }
+            if(i < this->m_Position.y - 1.75 && i > blockbelow && data->GetBlock(xinchunk, i, zinchunk) != AIR && std::find(billboards.begin(), billboards.end(), data->GetBlock(xinchunk, i, zinchunk)) == billboards.end())
+                blockbelow = i + 1;
 
-        if (m_Position.y - 1.75 > blockHeight)
+        }
+        if (data->GetBlock(xinchunk, int(m_Position.y), zinchunk) != AIR)
+        {
+            m_Velocity.y *= 0.7f;
+            m_Velocity.y = -m_Velocity.y;
+            m_Position.y = int(m_Position.y) - 0.1f;
+
+        }
+        if (m_Position.y - 1.75 > blockbelow)
         {
            m_Velocity.y -= 9.81f * float(deltaTime);
            inAir = true;
 
         }
-        else
+        else // If is not in the air
         {
-            if (inAir)
+            if (inAir) // if in air is true
             {
-                m_Velocity.y = 0.0f;
-                inAir = false;
+                m_Velocity.y = 0.0f; // set vertical velocity to 0
+                m_Position.y = blockbelow + 1.75f;
+                inAir = false; // set inAir to false
             }
         }
             
@@ -117,9 +124,8 @@ public:
 
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
         {
-            if (!spacePress)
+            if (!spacePress && !inAir)
                 m_Velocity.y += 7.0f;
-            std::cout << m_Velocity.y << "\n";
             spacePress = 1;
         }
         else spacePress = 0;
@@ -232,7 +238,7 @@ public:
             }
 
             if(targetBlock != glm::vec3(0, 0, 0))
-                planet->getChunkData({ ChunkX, ChunkZ })->UpdateBlock(targetBlock.x, targetBlock.y, targetBlock.z, PINKWOOL);
+                planet->getChunkData({ ChunkX, ChunkZ })->UpdateBlock(int(targetBlock.x), int(targetBlock.y), int(targetBlock.z), PINKWOOL);
             MB2Press = true;
         }
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)
@@ -244,11 +250,20 @@ public:
 
         int ChunkX = static_cast<int>(floor(m_Position.x / CHUNK_SIZE));
         int ChunkZ = static_cast<int>(floor(m_Position.z / CHUNK_SIZE));
-        ChunkData* chunkD = planet->getChunkData({ ChunkX, ChunkZ });
+
         int xinchunk = int(m_Position.x) - ChunkX * CHUNK_SIZE;
         int zinchunk = int(m_Position.z) - ChunkZ * CHUNK_SIZE;
         int yinchunk = int(m_Position.y);
         
+        if (xinchunk > CHUNK_SIZE) ChunkX += 1;
+        if (zinchunk > CHUNK_SIZE) ChunkZ += 1;
+
+        if (xinchunk < 0) ChunkX -= 1;
+        if (zinchunk < 0) ChunkZ -= 1;
+        ChunkData* chunkD = planet->getChunkData({ ChunkX, ChunkZ });
+        xinchunk = int(m_Position.x) - ChunkX * CHUNK_SIZE;
+        zinchunk = int(m_Position.z) - ChunkZ * CHUNK_SIZE;
+
         if ((chunkD->GetBlock(int(m_Position.x + m_Velocity.x * float(deltaTime)), yinchunk, zinchunk) == AIR ||
             std::find(billboards.begin(), billboards.end(), chunkD->GetBlock(int(m_Position.x + m_Velocity.x * float(deltaTime)), yinchunk, zinchunk)) != billboards.end()) &&
             (chunkD->GetBlock(int(m_Position.x + m_Velocity.x * float(deltaTime)), yinchunk - 1, zinchunk) == AIR ||

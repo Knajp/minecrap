@@ -13,7 +13,7 @@
 #include "structs.h"
 #include "World.h"
 #include "Texture.h"
-
+#include "HUD.h"
 /*
     TODO:
         - fix white lines pls
@@ -191,11 +191,11 @@ int main(int argc, char** argv) {
     glViewport(0, 0, 800, 800);
 
     const TextureAtlas atlas1 = TextureAtlas("src/texture/ta1.png");
+    const Texture crosshairTexture = Texture("src/texture/crosshair.png");
 
-
+    Crosshair crosshair;
 
     glUseProgram(shaderProgram);
-    std::cout << glGetUniformLocation(shaderProgram, "modelMatrix");
     GLuint mmLoc = glGetUniformLocation(shaderProgram, "modelMatrix");
     GLuint texmmLoc = glGetUniformLocation(textureShaderProgram, "modelMatrix");
 
@@ -218,13 +218,14 @@ int main(int argc, char** argv) {
         prevTime = currentTime;
 
 
-        // Render the cube
+
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, atlas1.ID);
 
         glUseProgram(textureShaderProgram);
 
-
+        
 
         camera.Inputs(window, deltaTime, planet);
         camera.Matrix(45.0f, 0.1f, 500.0f, textureShaderProgram, "camMatrix");

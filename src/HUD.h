@@ -6,6 +6,7 @@
 
 class Crosshair
 {
+public:
 	Crosshair()
 	{
 		HUDvertex vertices[] = {
@@ -42,12 +43,13 @@ class Crosshair
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 	// Add texture
-	void Render(GLuint shaderProgram)
+	void Render()
 	{
 		
 		glBindVertexArray(VAO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
+		std::cout << "Drawing crosshair\n";
 		glDrawElements(GL_TRIANGLES, 8 * sizeof(float), GL_UNSIGNED_SHORT, NULL);
 
 

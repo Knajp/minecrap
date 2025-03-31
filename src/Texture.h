@@ -65,6 +65,8 @@ public:
 
 class Texture
 {
+public:
+
 	Texture(const char* filePath)
 	{
 		glGenTextures(1, &ID);
