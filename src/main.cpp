@@ -52,6 +52,20 @@ GLFWwindow* init()
     glEnable(GL_MULTISAMPLE);
 	return window;
 }
+bool checkShaderCompileErrors(GLuint shaderID) {
+    GLint success;
+    GLchar infoLog[1024];
+
+    // Check for compile errors
+    glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(shaderID, 1024, NULL, infoLog);
+        std::cerr << "Shader Compilation Failed: " << infoLog << std::endl;
+        return false;
+    }
+
+    return true;
+}
 #pragma endregion
 	
 const char* vertexShaderSource = "#version 430 core\n"
@@ -104,31 +118,36 @@ const char* tFragmentShaderSource =
 "    FragColor = texColor;\n"
 "}\0";
 
-const char* invertedVertexShaderSource =
-"#version 430 core\n"
-"layout(location = 0) in vec2 inPos;\n"
-"layout(location = 1) in vec2 texCoord;\n"
-"uniform mat4 proj;"
-"out vec2 TexCoord;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = projection * vec4(inPos, 0.0, 1.0);"
-"   TexCoord = inTexCoords;"
-"{\0";
+const char* HUDvertexShaderSource = R"(
+    #version 430 core
+    layout(location = 0) in vec2 inPos;
+    layout(location = 1) in vec2 texCoord;
 
-const char* invertedFragmentShaderSource =
-"#version 430 core\n"
-"out vec4 FragColor;\n"
-"in vec2 TexCoord;\n"
-"uniform sampler2D ourTexture;\n"
-"void main()\n"
-"{\n"
-"   vec4 texColor = texture(ourTexture, TexCoord);\n"
-"   if(ourTexture.a == 0)\n"
-"       discard;\n"
-"   texColor.a = 0.8;\n"
-"   FragColor = texColor;\n"
-"}\0";
+    uniform mat4 projection;
+    uniform float xTrans;
+
+    out vec2 TexCoord;
+
+    void main() {
+        vec2 transPos = inPos + vec2(xTrans, 0.0f);
+        gl_Position = projection * vec4(transPos, 0.0, 1.0);
+        TexCoord = texCoord;
+    })";
+
+const char* HUDfragmentShaderSource = R"(
+    #version 430 core
+    out vec4 FragColor;
+    in vec2 TexCoord;
+
+    uniform sampler2D ourTexture;
+
+    void main() {
+        vec4 texColor = texture(ourTexture, TexCoord);
+        if (texColor.a < 0.1f) {
+            discard;
+        }
+        FragColor = texColor;
+    })";
 
 
 int main(int argc, char** argv) {
@@ -169,12 +188,22 @@ int main(int argc, char** argv) {
     glDeleteShader(tFragShader);
 
     GLuint iVertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(iVertexShader, 1, &invertedVertexShaderSource, NULL);
+    glShaderSource(iVertexShader, 1, &HUDvertexShaderSource, NULL);
     glCompileShader(iVertexShader);
 
+    if (!checkShaderCompileErrors(iVertexShader)) {
+        glDeleteShader(iVertexShader);  // Delete the shader if compilation fails
+        std::cout << "Vertex shader compile failed\n";
+    }
+
     GLuint iFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(iFragmentShader, 1, &invertedFragmentShaderSource, NULL);
+    glShaderSource(iFragmentShader, 1, &HUDfragmentShaderSource, NULL);
     glCompileShader(iFragmentShader);
+
+    if (!checkShaderCompileErrors(iFragmentShader)) {
+        glDeleteShader(iFragmentShader);  // Delete the shader if compilation fails
+        std::cout << "Vertex shader compile failed\n";
+    }
 
     GLuint invertedShaderProgram = glCreateProgram();
     glAttachShader(invertedShaderProgram, iVertexShader);
@@ -194,7 +223,7 @@ int main(int argc, char** argv) {
     const Texture crosshairTexture = Texture("src/texture/crosshair.png");
 
     Crosshair crosshair;
-
+    Hotbar hotbar;
     glUseProgram(shaderProgram);
     GLuint mmLoc = glGetUniformLocation(shaderProgram, "modelMatrix");
     GLuint texmmLoc = glGetUniformLocation(textureShaderProgram, "modelMatrix");
@@ -221,11 +250,15 @@ int main(int argc, char** argv) {
 
 
         glActiveTexture(GL_TEXTURE0);
+
+        glBindTexture(GL_TEXTURE_2D, crosshairTexture.ID);
+        crosshair.Render(invertedShaderProgram);
+
+        hotbar.Render(invertedShaderProgram, 1.0f);
+
         glBindTexture(GL_TEXTURE_2D, atlas1.ID);
 
         glUseProgram(textureShaderProgram);
-
-        
 
         camera.Inputs(window, deltaTime, planet);
         camera.Matrix(45.0f, 0.1f, 500.0f, textureShaderProgram, "camMatrix");

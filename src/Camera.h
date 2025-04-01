@@ -20,7 +20,7 @@ public:
 
     int m_Width, m_Height;
 
-    float m_Speed = 20.0f;
+    float m_Speed = 2.0f;
     float m_Sens = 100.0f;
 
 private:
@@ -125,7 +125,7 @@ public:
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
         {
             if (!spacePress && !inAir)
-                m_Velocity.y += 7.0f;
+                m_Velocity.y += 4.5f;
             spacePress = 1;
         }
         else spacePress = 0;
@@ -135,7 +135,7 @@ public:
         }
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
         {
-            m_Speed = 0.1f;
+            m_Speed = 0.2f;
         }
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
