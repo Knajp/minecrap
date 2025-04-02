@@ -26,6 +26,8 @@ const Vector2f cyanWool = { 15 * tileSize, 1 - tileSize };
 const Vector2f grayWool = { 16 * tileSize, 1 - tileSize };
 const Vector2f magentaWool = { 17 * tileSize, 1 - tileSize };
 
+const Vector2f woodenPlanks = { 18 * tileSize, 1 - tileSize };
+
 Vector2f getBlockTexture(int _b, uint16_t _f);
 
 

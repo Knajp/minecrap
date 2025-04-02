@@ -22,6 +22,8 @@ public:
 
     float m_Speed = 2.0f;
     float m_Sens = 100.0f;
+    unsigned short int selectedBlock = 0;
+    BLOCKTYPE inventory[9] = { PINKWOOL, MAGEWOOL, REDWOOL, PURPWOOL, YELLWOOL, BLUEWOOL, CYANWOOL, PLANKS, WOOD };
 
 private:
     glm::vec3 m_Position;
@@ -137,6 +139,25 @@ public:
         {
             m_Speed = 0.2f;
         }
+        if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+            selectedBlock = 0;
+        if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+            selectedBlock = 1;
+        if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+            selectedBlock = 2;
+        if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+            selectedBlock = 3;
+        if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+            selectedBlock = 4;
+        if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
+            selectedBlock = 5;
+        if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS)
+            selectedBlock = 6;
+        if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS)
+            selectedBlock = 7;
+        if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS)
+            selectedBlock = 8;
+
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
             glfwSetWindowShouldClose(window, true);
@@ -167,6 +188,8 @@ public:
             }
             MB1Press = true;
         }
+
+
 
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
         {
@@ -238,7 +261,7 @@ public:
             }
 
             if(targetBlock != glm::vec3(0, 0, 0))
-                planet->getChunkData({ ChunkX, ChunkZ })->UpdateBlock(int(targetBlock.x), int(targetBlock.y), int(targetBlock.z), PINKWOOL);
+                planet->getChunkData({ ChunkX, ChunkZ })->UpdateBlock(int(targetBlock.x), int(targetBlock.y), int(targetBlock.z), inventory[selectedBlock]);
             MB2Press = true;
         }
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)

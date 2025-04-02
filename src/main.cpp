@@ -254,7 +254,7 @@ int main(int argc, char** argv) {
         glBindTexture(GL_TEXTURE_2D, crosshairTexture.ID);
         crosshair.Render(invertedShaderProgram);
 
-        hotbar.Render(invertedShaderProgram, 1.0f);
+        hotbar.Render(invertedShaderProgram, float(camera.selectedBlock));
 
         glBindTexture(GL_TEXTURE_2D, atlas1.ID);
 

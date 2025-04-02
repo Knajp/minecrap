@@ -68,16 +68,16 @@ public:
 	Hotbar()
 	{
 		HUDvertex vertices[] = {
-			{-0.60f, -1.0f, 0.0f, 0.0f},
-			{0.60f, -1.0f, 1.0f, 0.0f},
-			{-0.60f, -0.85f, 0.0f, 1.0f},
-			{0.60f, -0.85f, 1.0f, 1.0f}
+			{-0.65f, -1.0f, 0.0f, 0.0f},
+			{0.65f, -1.0f, 1.0f, 0.0f},
+			{-0.65f, -0.85f, 0.0f, 1.0f},
+			{0.65f, -0.85f, 1.0f, 1.0f}
 		};
 		HUDvertex sVertices[] = {
-			{-0.60f, -1.0f, 0.0f, 0.0f},
-			{-0.45f, -1.0f, 1.0f, 0.0f},
-			{-0.60f, -0.85f, 0.0f, 1.0f},
-			{-0.45f, -0.85f, 1.0f, 1.0f}
+			{-0.65f, -1.0f, 0.0f, 0.0f},
+			{-0.51f, -1.0f, 1.0f, 0.0f},
+			{-0.65f, -0.85f, 0.0f, 1.0f},
+			{-0.51f, -0.85f, 1.0f, 1.0f}
 		};
 
 		GLushort indices[] = {
@@ -141,7 +141,7 @@ public:
 
 		GLint transLoc = glGetUniformLocation(shaderProgram, "xTrans");
 
-		glUniform1f(transLoc, xTrans * 0.15f);
+		glUniform1f(transLoc, xTrans * 0.145f);
 
 		glBindTexture(GL_TEXTURE_2D, selectTexture.ID);
 
