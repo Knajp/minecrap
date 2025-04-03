@@ -28,6 +28,11 @@ const Vector2f magentaWool = { 17 * tileSize, 1 - tileSize };
 
 const Vector2f woodenPlanks = { 18 * tileSize, 1 - tileSize };
 
+const Vector2f ironOre = { 19 * tileSize , 1 - tileSize };
+const Vector2f diamondOre = { 20 * tileSize , 1 - tileSize };
+const Vector2f goldOre = { 21 * tileSize , 1 - tileSize };
+const Vector2f pinkOre = { 22 * tileSize , 1 - tileSize };
+
 Vector2f getBlockTexture(int _b, uint16_t _f);
 
 

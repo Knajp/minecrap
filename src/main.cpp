@@ -231,7 +231,7 @@ int main(int argc, char** argv) {
     Planet* planet = new Planet(5, texmmLoc, time(NULL));
 
     glClearColor(0.639f, 0.8f, 0.984f, 1.0f);
-    glDisable(GL_CULL_FACE);
+    glDisable(GL_CULL_FACE); 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     double deltaTime = 0.0f;

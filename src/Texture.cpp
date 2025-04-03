@@ -31,5 +31,9 @@ Vector2f getBlockTexture(int _b, uint16_t _f)
 	if (_b == 15) return grayWool;
 	if (_b == 16) return magentaWool;
 	if (_b == 17) return woodenPlanks;
+	if (_b == 18) return ironOre;
+	if (_b == 19) return diamondOre;
+	if (_b == 20) return goldOre;
+	if (_b == 21) return pinkOre;
 	return { 0,0 };
 }

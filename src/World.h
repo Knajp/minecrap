@@ -36,7 +36,7 @@ enum BLOCKTYPE
 {
     AIR, GRASS, DIRT, STONE, TALLGRASS, ROSE, BLUEFLOWER, WOOD, LEAVES,
     PURPWOOL, PINKWOOL, REDWOOL, BLUEWOOL, YELLWOOL, CYANWOOL, GRAYWOOL, MAGEWOOL,
-    PLANKS
+    PLANKS, IRONORE, DIAMONDORE, GOLDORE, PINKORE
 };
 enum FACE
 {
@@ -74,7 +74,7 @@ struct ChunkData
     
     void UpdateBlock(int x, int y, int z, BLOCKTYPE type)
     {
-        if (GetIndex(x, y, z) > CHUNK_SIZE * CHUNK_HEIGHT * CHUNK_SIZE) return;
+        if (GetIndex(x, y, z) > CHUNK_SIZE * CHUNK_HEIGHT * CHUNK_SIZE || GetIndex(x, y, z) < 0) return;
         chunkData[GetIndex(x, y, z)] = type;
         updateRequired = true;
     }
@@ -607,7 +607,7 @@ private:
     glm::vec3 lastPlrPosition;
     glm::ivec2 lastPlrChunk;
 
-    int renderDistance = 7;
+    int renderDistance = 3;
 
     OpenSimplexNoise::Noise noise2D;
     OpenSimplexNoise::Noise noiseGenerator;
@@ -615,3 +615,5 @@ private:
     std::unordered_map<glm::vec2, Chunk*, ChunkPosHash> chunks;
     std::unordered_map<glm::vec2, ChunkData*, ChunkPosHash> chunkData;
 };
+
+//cwel jebany

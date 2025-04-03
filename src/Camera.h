@@ -121,7 +121,7 @@ public:
         }
         if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
         {
-            std::cout << m_Velocity.y << "\n";
+            m_Position.y = 60.0f;
         }
 
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
