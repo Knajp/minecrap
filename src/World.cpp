@@ -30,6 +30,7 @@ void Planet::Update(const Camera& camera, GLuint modelLoc)
                 {
                     uint16_t* chunkD = LoadChunkAtPos(int(worldPos.x), int(worldPos.y));
                     Chunk* chunk = new Chunk(worldPos, modelLoc, chunkD);
+                    chunk->SaveToJSON();
                     nchunks[worldPos] = chunk;
                     nchunkData[worldPos] = chunk->getData();
                 }

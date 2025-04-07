@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <fstream>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -237,6 +238,9 @@ int main(int argc, char** argv) {
     double deltaTime = 0.0f;
     double prevTime = glfwGetTime();
 
+    std::ofstream File("saves/world.json");
+    File << "{\n";
+    planet->Update(camera, texmmLoc);
     // Render loop
     while (!glfwWindowShouldClose(window)) {
         // Clear buffers
@@ -270,7 +274,7 @@ int main(int argc, char** argv) {
         glfwSwapBuffers(window);
     }
 
-
+    File.close();
     glfwTerminate();
     return 0;
 }

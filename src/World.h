@@ -18,7 +18,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <cstdlib>
-
+#include <fstream>
 #include "Texture.h"
 
 
@@ -176,6 +176,34 @@ public:
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_billboardIndices.size() * sizeof(GLushort), m_billboardIndices.data(), GL_STATIC_DRAW);
 
         m_data.updateRequired = false;
+    }
+    void SaveToJSON() const
+    {
+        std::ofstream File("saves/world.json", std::ios::app);
+
+        if (!File.is_open())
+            return;
+
+ 
+        File << "{{\n";
+        File << "\"locationX\" : " << m_WorldPos.x << ",\n";
+        File << "\"locationZ\" : " << m_WorldPos.y << ",\n"; 
+
+        File << "\"data\" : [\n";
+
+        for (int i = 0; i < CHUNK_SIZE * CHUNK_HEIGHT * CHUNK_SIZE; i++)
+        {
+            File << m_data.chunkData[i];
+
+            if (i != (CHUNK_SIZE * CHUNK_HEIGHT * CHUNK_SIZE) - 1)
+                File << ",";
+            
+        }
+
+        File << "]\n";
+        File << "}\n";
+
+        File.close();
     }
     void Render() const
     {
@@ -572,6 +600,7 @@ public:
                 }
             }
         }
+        
         return chunkD;
     }
     ~Planet()
