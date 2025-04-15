@@ -20,6 +20,8 @@ public:
 
     int m_Width, m_Height;
 
+    int playerHealth = 8;
+
     float m_Speed = 2.0f;
     float m_Sens = 100.0f;
     unsigned short int selectedBlock = 0;
@@ -87,6 +89,10 @@ public:
         {
             if (inAir) // if in air is true
             {
+                if (m_Velocity.y < -2.0f)
+                {
+                    playerHealth += m_Velocity.y / 2;
+                }
                 m_Velocity.y = 0.0f; // set vertical velocity to 0
                 m_Position.y = blockbelow + 1.75f;
                 inAir = false; // set inAir to false

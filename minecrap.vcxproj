@@ -99,6 +99,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\Game.h" />
+    <ClInclude Include="src\Graphics.h" />
     <ClInclude Include="src\HUD.h" />
     <ClInclude Include="src\OpenSimplexNoise.h" />
     <ClInclude Include="src\stb_image.h" />

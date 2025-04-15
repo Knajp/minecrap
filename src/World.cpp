@@ -5,9 +5,7 @@ void Planet::Update(const Camera& camera, GLuint modelLoc)
 {
     glm::vec3 currentPlrPosition = camera.getPosition();
 
-    glm::ivec2 currentPlrChunk;
-    currentPlrChunk.x = static_cast<int>(floor(currentPlrPosition.x / CHUNK_SIZE));
-    currentPlrChunk.y = static_cast<int>(floor(currentPlrPosition.z / CHUNK_SIZE));
+    glm::ivec2 currentPlrChunk = glm::ivec2(static_cast<int>(floor(currentPlrPosition.x / CHUNK_SIZE)), static_cast<int>(floor(currentPlrPosition.z / CHUNK_SIZE)));
 
     if (currentPlrChunk != lastPlrChunk)
     {

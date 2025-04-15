@@ -3,7 +3,7 @@
 #include <memory>
 #include "structs.h"
 #include "stb_image.h"
-
+#include <iostream>
 const float tileSize = 0.03125f;
 
 const Vector2f grassTopPos = { tileSize, 1-tileSize };
@@ -39,8 +39,13 @@ Vector2f getBlockTexture(int _b, uint16_t _f);
 class TextureAtlas
 {
 public:
+	TextureAtlas()
+	{
+
+	}
 	TextureAtlas(const char* filePath)
 	{
+		glActiveTexture(GL_TEXTURE0);
 		glGenTextures(1, &ID);
 		
 		glBindTexture(GL_TEXTURE_2D, ID);
@@ -73,9 +78,13 @@ public:
 class Texture
 {
 public:
+	Texture()
+	{
 
+	}
 	Texture(const char* filePath)
 	{
+		glActiveTexture(GL_TEXTURE0);
 		glGenTextures(1, &ID);
 
 		glBindTexture(GL_TEXTURE_2D, ID);
@@ -99,8 +108,20 @@ public:
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	GLuint ID;
-
 	int width, height, numColCh;
 };
-
+class TextureManager
+{
+public:
+	TextureManager()
+	{
+	}
+	void Init()
+	{
+		crosshairTexture = Texture("src/texture/crosshair.png");
+		atlas1 = TextureAtlas("src/texture/ta1.png");
+	}
+	TextureAtlas atlas1;
+	Texture crosshairTexture;
+};
 

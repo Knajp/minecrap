@@ -18,6 +18,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <cstdlib>
+#include <thread>
 
 #include "Texture.h"
 
@@ -25,7 +26,6 @@
 class Camera;
 /*
     TODO: 
-        - implement multithreading
         - find unoptimized fragments and optimize
 */
 const unsigned short int  CHUNK_SIZE = 16;

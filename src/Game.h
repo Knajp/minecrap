@@ -81,7 +81,7 @@ public:
             glBindTexture(GL_TEXTURE_2D, tManager.crosshairTexture.ID);
             crosshair.Render(sManager.invertedShaderProgram);
 
-            hotbar.Render(sManager.invertedShaderProgram, float(camera.selectedBlock));
+            hotbar.Render(sManager.invertedShaderProgram, float(camera.selectedBlock), &camera);
 
             glBindTexture(GL_TEXTURE_2D, tManager.atlas1.ID);
 
