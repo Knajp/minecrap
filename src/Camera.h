@@ -280,18 +280,18 @@ public:
         int ChunkX = static_cast<int>(floor(m_Position.x / CHUNK_SIZE));
         int ChunkZ = static_cast<int>(floor(m_Position.z / CHUNK_SIZE));
 
-        int xinchunk = int(m_Position.x) - ChunkX * CHUNK_SIZE;
-        int zinchunk = int(m_Position.z) - ChunkZ * CHUNK_SIZE;
+        int tempxinchunk = int(m_Position.x + m_Velocity.x * float(deltaTime)) - ChunkX * CHUNK_SIZE;
+        int tempzinchunk = int(m_Position.z + m_Velocity.z * float(deltaTime)) - ChunkZ * CHUNK_SIZE;
         int yinchunk = int(m_Position.y);
         
-        if (xinchunk > CHUNK_SIZE) ChunkX += 1;
-        if (zinchunk > CHUNK_SIZE) ChunkZ += 1;
+        if (tempxinchunk > CHUNK_SIZE) ChunkX += 1;
+        if (tempzinchunk > CHUNK_SIZE) ChunkZ += 1;
 
-        if (xinchunk < 0) ChunkX -= 1;
-        if (zinchunk < 0) ChunkZ -= 1;
+        if (tempxinchunk < 0) ChunkX -= 1;
+        if (tempzinchunk < 0) ChunkZ -= 1;
         ChunkData* chunkD = planet->getChunkData({ ChunkX, ChunkZ });
-        xinchunk = int(m_Position.x) - ChunkX * CHUNK_SIZE;
-        zinchunk = int(m_Position.z) - ChunkZ * CHUNK_SIZE;
+        int xinchunk = int(m_Position.x) - ChunkX * CHUNK_SIZE;
+        int zinchunk = int(m_Position.z) - ChunkZ * CHUNK_SIZE;
 
         if ((chunkD->GetBlock(int(m_Position.x + m_Velocity.x * float(deltaTime)), yinchunk, zinchunk) == AIR ||
             std::find(billboards.begin(), billboards.end(), chunkD->GetBlock(int(m_Position.x + m_Velocity.x * float(deltaTime)), yinchunk, zinchunk)) != billboards.end()) &&

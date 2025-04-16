@@ -177,6 +177,34 @@ public:
 
         m_data.updateRequired = false;
     }
+    void SaveToJSON() const
+    {
+        std::ofstream File("saves/world.json", std::ios::app);
+
+        if (!File.is_open())
+            return;
+
+ 
+        File << "{{\n";
+        File << "\"locationX\" : " << m_WorldPos.x << ",\n";
+        File << "\"locationZ\" : " << m_WorldPos.y << ",\n"; 
+
+        File << "\"data\" : [\n";
+
+        for (int i = 0; i < CHUNK_SIZE * CHUNK_HEIGHT * CHUNK_SIZE; i++)
+        {
+            File << m_data.chunkData[i];
+
+            if (i != (CHUNK_SIZE * CHUNK_HEIGHT * CHUNK_SIZE) - 1)
+                File << ",";
+            
+        }
+
+        File << "]\n";
+        File << "}\n";
+
+        File.close();
+    }
     void Render() const
     {
         glBindVertexArray(VAO);
@@ -572,6 +600,7 @@ public:
                 }
             }
         }
+        
         return chunkD;
     }
     ~Planet()
