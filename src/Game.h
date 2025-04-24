@@ -17,7 +17,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-const char* SAVEFILE = "house";
+const char* SAVEFILE = "house"; // test
 const std::string filePath = "saves/" + std::string(SAVEFILE) + ".json";
 //  The main game class
 class Game
