@@ -93,7 +93,7 @@ public:
 		HUDvertex heartVertices[] {
 			{-0.65f, -0.85f, 0.0f, 0.0f},
 			{-0.5875f, -0.85f, 1.0f, 0.0f},
-			{-0.65f, -0.7875, 0.0f, 1.0f},
+			{-0.65f, -0.7875f, 0.0f, 1.0f},
 			{-0.5875f, -0.7875f, 1.0f, 1.0f}
 		};
 		GLushort indices[] = {
@@ -201,7 +201,7 @@ public:
 
 		for (int i = 0; i < camera->playerHealth; i++)
 		{
-			glUniform1f(transLoc, i * 0.065);
+			glUniform1f(transLoc, i * 0.065f);
 
 			glBindVertexArray(hVAO);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, hEBO);

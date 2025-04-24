@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "HUD.h"
 #include "Graphics.h"
+#include <json/yyjson.h>
 
 //  Callback for handling GLFW errors
 void glfw_error_callback(int error, const char* description) {
@@ -16,6 +17,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+const char* SAVEFILE = "house";
+const std::string filePath = "saves/" + std::string(SAVEFILE) + ".json";
 //  The main game class
 class Game
 {
@@ -35,16 +38,71 @@ public:
 
         glfwMakeContextCurrent(window); //  Critical: creating an OpenGL context
         
+        int64_t seed = time(NULL); 
 
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {
             glfwDestroyWindow(window);
             glfwTerminate(); // Exit if glad (basically OpenGL) failed to load
         }
-        std::cout << "all g"; // Old debug message, still nice to have
+
+        
+
+        std::fstream exists(filePath);
+        if (exists.is_open())
+        {
+            std::ifstream inFile(filePath);
+            std::stringstream buffer;
+            buffer << inFile.rdbuf();
+            std::string contents = buffer.str();
+
+            const char* json = contents.c_str();
+
+            yyjson_doc* doc = yyjson_read(json, strlen(json), 0);
+            yyjson_val* root = yyjson_doc_get_root(doc);
+            yyjson_val* gameObj = yyjson_arr_get(root, 0);
+
+            yyjson_val* savedSeed = yyjson_obj_get(gameObj, "seed");
+            seed = yyjson_get_num(savedSeed);
+
+            inFile.close();
+        }
+        else
+        {
+            std::ofstream File(filePath);
+            File << "[\n\n]";
+            File.close();
+
+            std::ifstream inFile(filePath);
+            std::stringstream buffer;
+            buffer << inFile.rdbuf();
+            std::string contents = buffer.str();
+
+            const char* json = contents.c_str();
+
+            yyjson_doc* doc = yyjson_read(json, strlen(json), 0);
+
+            yyjson_mut_doc* mut_doc = yyjson_doc_mut_copy(doc, NULL);
+            yyjson_mut_val* mut_root = yyjson_mut_doc_get_root(mut_doc);
+
+            yyjson_mut_val* gameObj = yyjson_mut_obj(mut_doc);
+            yyjson_mut_obj_add_int(mut_doc, gameObj, "seed", seed);
+            yyjson_mut_obj_add_str(mut_doc, gameObj, "save", "def");
+
+            yyjson_mut_arr_append(mut_root, gameObj);
+
+            const char* out_json = yyjson_mut_write(mut_doc, YYJSON_WRITE_PRETTY, NULL);
+
+            std::ofstream outFile(filePath);
+            outFile << out_json;
+            outFile.close();
+            inFile.close();
+        }
         tManager = TextureManager(); // Creating the texture manager
         tManager.Init(); // This funcion exists to prevent throws
         sManager = ShaderManager(1); //Creating the shaderManager
+
+        
 
         glEnable(GL_MULTISAMPLE); //    Enabling antialiasing
         glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); //   Enabling window resize
@@ -56,7 +114,7 @@ public:
 
         crosshair = Crosshair::Crosshair(1); // Creating the crosshair using a dummy constructor
         hotbar = Hotbar::Hotbar(1); // Creating the hotbar using a dummy constructor
-        planet = new Planet(5, sManager.texmmLoc, time(NULL)); //   Critical: creating the planet
+        planet = new Planet(5, sManager.texmmLoc, seed); //   Critical: creating the planet
 
         glClearColor(0.639f, 0.8f, 0.984f, 1.0f); // Sky colour
         glDisable(GL_CULL_FACE); // Transparency stuff
@@ -101,6 +159,7 @@ public:
     }
     void Terminate()
     {
+        planet->Save();
         glfwTerminate(); // Destroy the window
     }
 

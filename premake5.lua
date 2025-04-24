@@ -6,6 +6,8 @@ project "minecrap"
 	kind "ConsoleApp"
 	language "C++"
 
+	defines{"GLM_ENABLE_EXPERIMENTAL"}
+
 	targetdir "bin/%{cfg.buildcfg}-%{cfg.architecture}"
 	objdir "bin-int/%{cfg.buildcfg}-%{cfg.architecture}"
 

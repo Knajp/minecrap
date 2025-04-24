@@ -89,7 +89,7 @@ public:
             {
                 if (m_Velocity.y < -10.0f) // If the y velocity is greater than 10m/s
                 {
-                    playerHealth += m_Velocity.y / 2; // Apply fall damage
+                    playerHealth += int(m_Velocity.y) / 2; // Apply fall damage
                 }
                 m_Velocity.y = 0.0f; // Remove all velocity
                 m_Position.y = blockbelow + 1.75f; // Correct players y positon
@@ -272,6 +272,7 @@ public:
 
             if(targetBlock != glm::vec3(0, 0, 0)) // Prevent throws
                 planet->getChunkData({ ChunkX, ChunkZ })->UpdateBlock(int(targetBlock.x), int(targetBlock.y), int(targetBlock.z), inventory[selectedBlock]); // Set the target block to selected block
+            
             MB2Press = true; // Not first contact anymore
         }
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) // If right mouse is released
@@ -288,14 +289,8 @@ public:
         int zinchunk = int(m_Position.z) - ChunkZ * CHUNK_SIZE; // Player's x and z in the chunk
         int yinchunk = int(m_Position.y); // Player's y
         
-        if (xinchunk > CHUNK_SIZE) ChunkX += 1;
-        if (zinchunk > CHUNK_SIZE) ChunkZ += 1; // Not working currently, TODO
-
-        if (tempxinchunk < 0) ChunkX -= 1;
-        if (tempzinchunk < 0) ChunkZ -= 1;
         ChunkData* chunkD = planet->getChunkData({ ChunkX, ChunkZ });
-        xinchunk = int(m_Position.x) - ChunkX * CHUNK_SIZE;
-        zinchunk = int(m_Position.z) - ChunkZ * CHUNK_SIZE; // TODO
+
 
         //Prevent going into blocks
         if ((chunkD->GetBlock(int(m_Position.x + m_Velocity.x * float(deltaTime)), yinchunk, zinchunk) == AIR ||

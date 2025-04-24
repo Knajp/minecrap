@@ -39,6 +39,7 @@ void Planet::Update(const Camera& camera, GLuint modelLoc)
         {
             if (nchunks.find(it->first) == nchunks.end())
             {
+                it->second->SaveToJSON();
                 delete it->second;
                 it = chunks.erase(it);
             }

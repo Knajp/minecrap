@@ -19,9 +19,12 @@
 #include <algorithm>
 #include <cstdlib>
 #include <thread>
-
+#include <fstream>
+#include <sstream>
+#include <json/yyjson.h>
 #include "Texture.h"
 
+extern const std::string filePath;
 
 class Camera;
 /*
@@ -61,6 +64,7 @@ struct ChunkData
 
     uint16_t* chunkData;
     bool updateRequired = false;
+    std::vector<std::pair<int, uint16_t>> changed;
 
     static int GetIndex(int x, int y, int z)
     {
@@ -76,6 +80,7 @@ struct ChunkData
     {
         if (GetIndex(x, y, z) > CHUNK_SIZE * CHUNK_HEIGHT * CHUNK_SIZE || GetIndex(x, y, z) < 0) return;
         chunkData[GetIndex(x, y, z)] = type;
+        changed.push_back({GetIndex(x,y,z), type});
         updateRequired = true;
     }
 };
@@ -177,33 +182,54 @@ public:
 
         m_data.updateRequired = false;
     }
-    void SaveToJSON() const
+    void SaveToJSON()
     {
-        std::ofstream File("saves/world.json", std::ios::app);
+        std::ifstream inFile(filePath);
 
-        if (!File.is_open())
+        std::stringstream buffer;
+        buffer << inFile.rdbuf();
+        std::string contents = buffer.str();
+
+        const char* json = contents.c_str();
+
+        yyjson_doc* doc = yyjson_read(json, strlen(json), 0);
+        if (!doc) {
+            std::cerr << "JSON parse failed.\n";
             return;
-
- 
-        File << "{{\n";
-        File << "\"locationX\" : " << m_WorldPos.x << ",\n";
-        File << "\"locationZ\" : " << m_WorldPos.y << ",\n"; 
-
-        File << "\"data\" : [\n";
-
-        for (int i = 0; i < CHUNK_SIZE * CHUNK_HEIGHT * CHUNK_SIZE; i++)
-        {
-            File << m_data.chunkData[i];
-
-            if (i != (CHUNK_SIZE * CHUNK_HEIGHT * CHUNK_SIZE) - 1)
-                File << ",";
-            
         }
+        yyjson_val* root = yyjson_doc_get_root(doc);
 
-        File << "]\n";
-        File << "}\n";
+        yyjson_mut_doc* mut_doc = yyjson_doc_mut_copy(doc, NULL);
+        yyjson_mut_val* mut_root = yyjson_mut_doc_get_root(mut_doc);
 
-        File.close();
+        yyjson_mut_val* newObj = yyjson_mut_obj(mut_doc);
+        yyjson_mut_obj_add_int(mut_doc, newObj, "locX", m_WorldPos.x);
+        yyjson_mut_obj_add_int(mut_doc, newObj, "locZ", m_WorldPos.y);
+
+        yyjson_mut_val* dataObj = yyjson_mut_obj(mut_doc);
+        yyjson_mut_val* dataKey = yyjson_mut_str(mut_doc, "data");
+        std::cout << "begin save\n";
+        for (const auto& pair : m_data.changed)
+        {
+            std::string strValue = std::to_string(pair.first);
+            yyjson_mut_val* key = yyjson_mut_strcpy(mut_doc, strValue.c_str());
+            yyjson_mut_val* val = yyjson_mut_int(mut_doc, pair.second);
+            yyjson_mut_obj_add(dataObj, key, val);
+            std::cout << "added new value\n";
+        }
+        yyjson_mut_obj_add(newObj, dataKey, dataObj);
+
+        yyjson_mut_arr_append(mut_root, newObj);
+
+        const char* out_json = yyjson_mut_write(mut_doc, YYJSON_WRITE_PRETTY, NULL);
+
+        std::ofstream outFile(filePath);
+        outFile << out_json;
+        outFile.close();
+
+        yyjson_doc_free(doc);
+        yyjson_mut_doc_free(mut_doc);
+        free((void*)out_json);
     }
     void Render() const
     {
@@ -429,6 +455,8 @@ private:
     std::vector<textureVertex> m_billboardVertices;
     std::vector<GLushort> m_billboardIndices;
 
+    
+
     GLuint VAO, VBO, EBO;
     GLuint bVAO, bVBO, bEBO;
 
@@ -601,6 +629,42 @@ public:
             }
         }
         
+
+        std::ifstream inFile(filePath);
+        std::stringstream buffer;
+        buffer << inFile.rdbuf();
+        std::string contents = buffer.str();
+        const char* json = contents.c_str();
+
+        yyjson_doc* doc = yyjson_read(json, contents.size(), 0);
+        yyjson_val* root = yyjson_doc_get_root(doc);
+
+        size_t idx, max;
+        yyjson_val* val;
+
+        yyjson_arr_foreach(root, idx, max, val) {
+            if (idx == 0) continue;
+            yyjson_val* X = yyjson_obj_get(val, "locX");
+            yyjson_val* Z = yyjson_obj_get(val, "locZ");
+
+            int64_t chunkX = yyjson_get_num(X);
+            int64_t chunkZ = yyjson_get_num(Z);
+            if (chunkX == x && chunkZ == z)
+            {
+                yyjson_val* data = yyjson_obj_get(val, "data");
+                yyjson_val* key;
+                yyjson_val* val2;
+                size_t idx2, max2;
+                yyjson_obj_foreach(data, idx2, max2, key, val2)
+                {
+                    const char* keyStr = yyjson_get_str(key);
+                    if (!keyStr) continue;
+                    int64_t index = std::stoll(keyStr);
+                    uint16_t block = yyjson_get_num(val2);
+                    chunkD[index] = block;
+                }
+            }
+        }
         return chunkD;
     }
     ~Planet()
@@ -629,6 +693,13 @@ public:
         }
         return nullptr;  
     }
+    void Save()
+    {
+        for (const auto& chunk : chunks)
+        {
+            chunk.second->SaveToJSON();
+        }
+    }
 public:
     static Planet* planet;
 
@@ -636,7 +707,7 @@ private:
     glm::vec3 lastPlrPosition;
     glm::ivec2 lastPlrChunk;
 
-    int renderDistance = 3;
+    int renderDistance = 5;
 
     OpenSimplexNoise::Noise noise2D;
     OpenSimplexNoise::Noise noiseGenerator;
@@ -644,5 +715,3 @@ private:
     std::unordered_map<glm::vec2, Chunk*, ChunkPosHash> chunks;
     std::unordered_map<glm::vec2, ChunkData*, ChunkPosHash> chunkData;
 };
-
-//cwel jebany
