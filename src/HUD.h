@@ -11,7 +11,7 @@ public:
 	{
 
 	}
-	Crosshair(int d)
+	Crosshair(int d, float aspect)
 	{
 		HUDvertex vertices[] = {
 			{-0.05f, -0.05f, 0.0f, 0.0f},
@@ -45,7 +45,7 @@ public:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindVertexArray(VAO);
-		projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
+		projection = glm::ortho(-aspect, aspect,-1.0f, 1.0f, -1.0f, 1.0f);
 	}
 	// Add texture
 	void Render(GLuint shaderProgram)
@@ -75,7 +75,7 @@ public:
 	{
 
 	}
-	Hotbar(int d)
+	Hotbar(int d, float aspect)
 	{
 		HUDvertex vertices[] = {
 			{-0.65f, -1.0f, 0.0f, 0.0f},
@@ -167,7 +167,7 @@ public:
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
+		projection = glm::ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
 	}
 	void Render(GLuint shaderProgram, float xTrans, Camera* camera)
 	{

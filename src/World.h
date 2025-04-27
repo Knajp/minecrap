@@ -208,14 +208,12 @@ public:
 
         yyjson_mut_val* dataObj = yyjson_mut_obj(mut_doc);
         yyjson_mut_val* dataKey = yyjson_mut_str(mut_doc, "data");
-        std::cout << "begin save\n";
         for (const auto& pair : m_data.changed)
         {
             std::string strValue = std::to_string(pair.first);
             yyjson_mut_val* key = yyjson_mut_strcpy(mut_doc, strValue.c_str());
             yyjson_mut_val* val = yyjson_mut_int(mut_doc, pair.second);
             yyjson_mut_obj_add(dataObj, key, val);
-            std::cout << "added new value\n";
         }
         yyjson_mut_obj_add(newObj, dataKey, dataObj);
 

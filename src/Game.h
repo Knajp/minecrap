@@ -34,8 +34,14 @@ public:
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //   Window hints (Version x., Version .x, profile)
         glfwWindowHint(GLFW_SAMPLES, 3); // Implementation of mild antialiasing
 
-        window = glfwCreateWindow(800, 800, "Minecrap", NULL, NULL); // Create a window 800x800
+        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
+        camera.Init(mode->width, mode->height, glm::vec3(0.0f, 60.0f, 1.0f));
+        window = glfwCreateWindow(mode->width, mode->height, "Minecrap", monitor, NULL); // Create a window 800x800
+
+        float aspect = (float)mode->width / (float)mode->height;
+        
         glfwMakeContextCurrent(window); //  Critical: creating an OpenGL context
         
         int64_t seed = time(NULL); 
@@ -108,12 +114,12 @@ public:
         glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); //   Enabling window resize
 
         glEnable(GL_DEPTH_TEST); // Enabling depth tests for no weird visual errors
-        glViewport(0, 0, 800, 800); // The viewport will be 800x800px
+        glViewport(0,0, mode->width, mode->height); // The viewport will be 800x800px
 
 
 
-        crosshair = Crosshair::Crosshair(1); // Creating the crosshair using a dummy constructor
-        hotbar = Hotbar::Hotbar(1); // Creating the hotbar using a dummy constructor
+        crosshair = Crosshair::Crosshair(1, aspect); // Creating the crosshair using a dummy constructor
+        hotbar = Hotbar::Hotbar(1, aspect); // Creating the hotbar using a dummy constructor
         planet = new Planet(5, sManager.texmmLoc, seed); //   Critical: creating the planet
 
         glClearColor(0.639f, 0.8f, 0.984f, 1.0f); // Sky colour
@@ -165,7 +171,7 @@ public:
 
 private:
     GLFWwindow* window;
-    Camera camera = Camera::Camera(800, 800, glm::vec3(0.0f, 60.0f, 1.0f));
+    Camera camera;
     Planet* planet;
     Crosshair crosshair;
     Hotbar hotbar;

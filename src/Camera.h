@@ -35,9 +35,13 @@ private:
     bool MB2Press = false;
     bool inAir = false;
 public:
-    Camera(int width, int height, glm::vec3 position) // The camera constructor, taking in the viewport width, height and initial player position
-        : m_Width(width), m_Height(height), m_Position(position) {}
-
+    Camera() {}// The camera constructor, taking in the viewport width, height and initial player position{}
+    void Init(int width, int height ,glm::vec3 position)
+    {
+        m_Width = width;
+        m_Height = height;
+        m_Position = position;
+    }
     glm::vec3 getPosition() const // Returns current player position
     {
         return m_Position;
@@ -46,7 +50,7 @@ public:
     {
         glm::mat4 view = glm::mat4(1.0f), projection = glm::mat4(1.0f); //  Initializing the view and proj matrices as identitiy
         view = glm::lookAt(m_Position, m_Position + m_Orientation, m_Up); //    The direction the camera is facing
-        projection = glm::perspective(glm::radians(FOVdeg), (float)(m_Width / m_Height), nearPlane, farPlane); // Dark magic lol
+        projection = glm::perspective(glm::radians(FOVdeg), (float)m_Width / (float)m_Height, nearPlane, farPlane); // Dark magic lol
 
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, uniform), 1, GL_FALSE, glm::value_ptr(projection * view)); // Send the matrix over to shader
     }
