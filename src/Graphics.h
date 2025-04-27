@@ -13,6 +13,7 @@ public:
     }
     ShaderManager(int d)
     {
+        std::cout << "smanager\n";
         GLuint tVertexShader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(tVertexShader, 1, &tVertexShaderSource, NULL);
         glCompileShader(tVertexShader);
@@ -32,10 +33,12 @@ public:
         GLuint iVertexShader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(iVertexShader, 1, &HUDvertexShaderSource, NULL);
         glCompileShader(iVertexShader);
+        checkShaderCompileErrors(iVertexShader);
 
         GLuint iFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
         glShaderSource(iFragmentShader, 1, &HUDfragmentShaderSource, NULL);
         glCompileShader(iFragmentShader);
+        checkShaderCompileErrors(iFragmentShader);
 
         invertedShaderProgram = glCreateProgram();
         glAttachShader(invertedShaderProgram, iVertexShader);
@@ -99,11 +102,11 @@ private:
 
     uniform mat4 projection;
     uniform float xTrans;
-
+    uniform float yTrans;
     out vec2 TexCoord;
 
     void main() {
-        vec2 transPos = inPos + vec2(xTrans, 0.0f);
+        vec2 transPos = inPos + vec2(xTrans, yTrans);
         gl_Position = projection * vec4(transPos, 0.0, 1.0);
         TexCoord = texCoord;
     })";

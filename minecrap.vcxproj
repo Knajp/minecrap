@@ -88,6 +88,7 @@
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\Graphics.h" />
     <ClInclude Include="src\HUD.h" />
+    <ClInclude Include="src\Menu.h" />
     <ClInclude Include="src\OpenSimplexNoise.h" />
     <ClInclude Include="src\Physics.h" />
     <ClInclude Include="src\Texture.h" />

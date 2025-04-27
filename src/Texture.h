@@ -98,8 +98,10 @@ public:
 		stbi_set_flip_vertically_on_load(true);
 
 		unsigned char* data = stbi_load(filePath, &width, &height, &numColCh, 0);
+
 		if (data)
 		{
+
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
@@ -120,8 +122,12 @@ public:
 	{
 		crosshairTexture = Texture("src/texture/crosshair.png");
 		atlas1 = TextureAtlas("src/texture/ta1.png");
+		titleScreen = Texture("src/texture/title.png");
+		menuButton = Texture("src/texture/button.png");
 	}
 	TextureAtlas atlas1;
 	Texture crosshairTexture;
+	Texture titleScreen;
+	Texture menuButton;
 };
 

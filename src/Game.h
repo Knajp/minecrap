@@ -6,6 +6,7 @@
 #include "HUD.h"
 #include "Graphics.h"
 #include <json/yyjson.h>
+#include "Menu.h"
 
 //  Callback for handling GLFW errors
 void glfw_error_callback(int error, const char* description) {
@@ -54,6 +55,28 @@ public:
 
         
 
+        glEnable(GL_MULTISAMPLE); //    Enabling antialiasing
+        glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); //   Enabling window resize
+
+        
+        glViewport(0, 0, mode->width, mode->height); // The viewport will be 800x800px
+
+        glClearColor(0.639f, 0.8f, 0.984f, 1.0f); // Sky colour
+        
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Even more transparency stuff
+        glEnable(GL_TEXTURE_2D);
+        glUseProgram(sManager.invertedShaderProgram);
+
+        tManager = TextureManager(); // Creating the texture manager
+        tManager.Init(); // This funcion exists to prevent throws
+        sManager = ShaderManager(1); //Creating the shaderManager
+
+        //Menu Part
+        Menu mainMenu(tManager.titleScreen.ID, aspect);
+        
+        mainMenu.Loop(sManager.invertedShaderProgram, window, tManager.menuButton, aspect);
+
+        std::cout << "afterloop\n";
         std::fstream exists(filePath);
         if (exists.is_open())
         {
@@ -104,28 +127,20 @@ public:
             outFile.close();
             inFile.close();
         }
-        tManager = TextureManager(); // Creating the texture manager
-        tManager.Init(); // This funcion exists to prevent throws
-        sManager = ShaderManager(1); //Creating the shaderManager
+        
 
         
 
-        glEnable(GL_MULTISAMPLE); //    Enabling antialiasing
-        glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); //   Enabling window resize
-
+        
+        glDisable(GL_CULL_FACE); // Transparency stuff
+        glEnable(GL_BLEND); // More Transparency stuff
         glEnable(GL_DEPTH_TEST); // Enabling depth tests for no weird visual errors
-        glViewport(0,0, mode->width, mode->height); // The viewport will be 800x800px
-
-
 
         crosshair = Crosshair::Crosshair(1, aspect); // Creating the crosshair using a dummy constructor
         hotbar = Hotbar::Hotbar(1, aspect); // Creating the hotbar using a dummy constructor
         planet = new Planet(5, sManager.texmmLoc, seed); //   Critical: creating the planet
 
-        glClearColor(0.639f, 0.8f, 0.984f, 1.0f); // Sky colour
-        glDisable(GL_CULL_FACE); // Transparency stuff
-        glEnable(GL_BLEND); // More Transparency stuff
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Even more transparency stuff
+        
 
 
         deltaTime = 0.0f; // This will be used for calculating things like movement per second. Every single unit dependant on time will now be per second.
@@ -156,6 +171,7 @@ public:
             camera.Inputs(window, deltaTime, planet); // Processing the inputs like keyboard input or mouse movement.
             camera.Matrix(45.0f, 0.1f, 500.0f, sManager.textureShaderProgram, "camMatrix"); // Calculating the camera matrix, crucial for 3d space
 
+            std::cout << "This should not be happening\n";
             planet->Update(camera, sManager.texmmLoc); // Updating the planet, this includes removing and adding blocks, rendering chunks if crossed
             planet->Render(); // Rendering the entire world
 
