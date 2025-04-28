@@ -3,7 +3,9 @@
 #include "structs.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <filesystem>
 
+extern char* FILENAME;
 class Button
 {
 public:
@@ -46,8 +48,48 @@ public:
 
 		projection = glm::ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
 	}
+	Button(Texture texture, float aspect, int i_fromTop, float xTrans)
+		:fromTop(i_fromTop), txt(texture), transX(xTrans)
+	{
+		HUDvertex vertices[] =
+		{
+			{-0.5f, 0.05f, 0.0f, 0.0f},
+			{0.5f, 0.05f, 1.0f, 0.0f},
+			{-0.5f, 0.2f, 0.0f, 1.0f},
+			{0.5f, 0.2f, 1.0f, 1.0f}
+		};
+		GLushort indices[] =
+		{
+			0,1,2,
+			2,1,3
+		};
+
+		glGenVertexArrays(1, &VAO);
+		glBindVertexArray(VAO);
+
+		glGenBuffers(1, &VBO);
+		glGenBuffers(1, &EBO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(HUDvertex), nullptr);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(HUDvertex), (void*)(2 * sizeof(GLfloat)));
+
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+
+		projection = glm::ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+	}
 	void Render(GLuint shaderProgram)
 	{
+		if (!visible) return;
 		glUseProgram(shaderProgram);
 
 		glActiveTexture(GL_TEXTURE0);
@@ -59,7 +101,7 @@ public:
 
 
 		GLint transLoc = glGetUniformLocation(shaderProgram, "xTrans");
-		glUniform1f(transLoc, 0);
+		glUniform1f(transLoc, transX);
 
 		GLint yLoc = glGetUniformLocation(shaderProgram, "yTrans");
 		float negative = fromTop * -0.2f;
@@ -70,18 +112,171 @@ public:
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 	}
+	bool visible = true;
 private:
 	glm::mat4 projection;
 	Texture txt;
 	GLuint VAO, VBO, EBO;
 	GLint fromTop = 0;
+	GLfloat transX = 0;
+	
+};
+
+class WorldSave
+{
+public:
+	WorldSave(GLuint text, float aspect, GLushort iindex)
+		:txt(text), index(iindex)
+	{
+		HUDvertex vertices[] =
+		{
+			{-0.9f, 0.5f, 0.0f, 0.0f},
+			{0.9f, 0.5f, 1.0f, 0.0f},
+			{-0.9f, 0.8f, 0.0f, 1.0f},
+			{0.9f, 0.8f, 1.0f, 1.0f}
+		};
+		GLushort indices[] =
+		{
+			0,1,2,
+			2,1,3
+		};
+
+		glGenVertexArrays(1, &VAO);
+		glBindVertexArray(VAO);
+
+		glGenBuffers(1, &VBO);
+		glGenBuffers(1, &EBO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(HUDvertex), nullptr);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(HUDvertex), (void*)(2 * sizeof(GLfloat)));
+
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+
+		projection = glm::ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+	}
+	void Render(GLuint shaderProgram)
+	{
+		if (!visible) return;
+		glUseProgram(shaderProgram);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, txt);
+
+		GLint projLoc = glGetUniformLocation(shaderProgram, "projection");
+
+		glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
+
+
+		GLint transLoc = glGetUniformLocation(shaderProgram, "xTrans");
+		glUniform1f(transLoc, 0);
+
+		GLint yLoc = glGetUniformLocation(shaderProgram, "yTrans");
+		float negative = index * -0.35f;
+		glUniform1f(yLoc, negative);
+
+		glBindVertexArray(VAO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+	}
+	unsigned short int index;
+	bool visible = false;
+private:
+	GLuint txt;
+	glm::mat4 projection;
+	GLuint VAO, VBO, EBO;
+};
+
+class WorldManager
+{
+public:
+	WorldManager(GLuint text, float aspect)
+		:texture(text)
+	{
+		HUDvertex vertices[] =
+		{
+			{-1.0f, -0.5f, 0.0f, 0.0f},
+			{1.0f, -0.5f, 1.0f, 0.0f},
+			{-1.0f, 0.9f, 0.0f, 1.0f},
+			{1.0f, 0.9f, 1.0f, 1.0f}
+		};
+		GLushort indices[] =
+		{
+			0,1,2,
+			2,1,3
+		};
+
+		glGenVertexArrays(1, &VAO);
+		glBindVertexArray(VAO);
+
+		glGenBuffers(1, &VBO);
+		glGenBuffers(1, &EBO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(HUDvertex), nullptr);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(HUDvertex), (void*)(2 * sizeof(GLfloat)));
+
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+
+		projection = glm::ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+	}
+	void Render(GLuint shaderProgram)
+	{
+		if (!visible) return;
+		glUseProgram(shaderProgram);
+
+		glUniform1i(glGetUniformLocation(shaderProgram, "texture1"), 0);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		// Set projection matrix uniform
+		GLint projLoc = glGetUniformLocation(shaderProgram, "projection");
+
+		glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
+
+
+		GLint transLoc = glGetUniformLocation(shaderProgram, "xTrans");
+		glUniform1f(transLoc, 0);
+
+		GLint yLoc = glGetUniformLocation(shaderProgram, "yTrans");
+		glUniform1f(yLoc, 0);
+
+		glBindVertexArray(VAO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+	}
+	bool visible = false;
+private:
+	GLuint VAO, VBO, EBO;
+	glm::mat4 projection;
+	GLuint texture;
 };
 
 class Menu
 {
 public:
-	Menu(GLuint txt, float aspect)
-		:texture(txt)
+	Menu(GLuint txt, GLuint txt2, float aspect)
+		:texture(txt), texture2(txt2), activeTexture(txt)
 	{
 		std::cout << "main menu\n";
 		HUDvertex menuVertices[4] =
@@ -133,7 +328,7 @@ public:
 		glUniform1i(glGetUniformLocation(shaderProgram, "texture1"), 0);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture);
+		glBindTexture(GL_TEXTURE_2D, activeTexture);
 		// Set projection matrix uniform
 		GLint projLoc = glGetUniformLocation(shaderProgram, "projection");
 		
@@ -153,12 +348,20 @@ public:
 
 		
 	}
-	void Loop(GLuint shaderProgram, GLFWwindow* window, Texture buttonTexture, float aspect)
+	void Loop(GLuint shaderProgram, GLFWwindow* window, Texture buttonTexture, Texture wmantext, Texture wsavetxt, const GLFWvidmode* mode)
 	{
+
+		float aspect = (float)mode->width / (float)mode->height;
 
 		Button newGame(buttonTexture, aspect);
 		Button savedGame(buttonTexture, aspect, 1);
 		Button exit(buttonTexture, aspect, 2);
+		Button back(buttonTexture, aspect, 4, -0.6f);
+		back.visible = false;
+		Button enter(buttonTexture, aspect, 4, 0.6f);
+		enter.visible = false;
+		WorldManager wman(wmantext.ID, aspect);
+		WorldSave exSave(wsavetxt.ID, aspect, 0);
 		while (!glfwWindowShouldClose(window))
 		{
 			GLenum error = glGetError();
@@ -168,13 +371,74 @@ public:
 			newGame.Render(shaderProgram);
 			savedGame.Render(shaderProgram);
 			exit.Render(shaderProgram);
+			back.Render(shaderProgram);
+			enter.Render(shaderProgram);
+			wman.Render(shaderProgram);
+			exSave.Render(shaderProgram);
+			if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
+			{
+				double xpos, ypos;
+				glfwGetCursorPos(window, &xpos, &ypos);
+
+				float x_ndc = (2.0f * xpos) / mode->width - 1.0f;
+				float y_ndc = 1.0f - (2.0f * ypos) / mode->height;
+				if (x_ndc >= -0.5f && x_ndc <= 0.5f)
+				{
+					if (y_ndc >= 0.05f && y_ndc <= 0.2f && newGame.visible)
+					{
+						newGame.visible = false;
+						savedGame.visible = false;
+						exit.visible = false;
+						activeTexture = texture2;
+						back.visible = true;
+						enter.visible = true;
+						wman.visible = true;
+					}
+
+					else if (y_ndc >= -0.15f && y_ndc <= 0.0f && savedGame.visible)
+					{
+						newGame.visible = false;
+						savedGame.visible = false;
+						exit.visible = false;
+						activeTexture = texture2;
+						back.visible = true;
+						enter.visible = true;
+						wman.visible = true;
+						exSave.visible = true;
+					}
+
+					else if (y_ndc >= -0.35f && y_ndc <= -0.2f && exit.visible)
+					{
+						glfwSetWindowShouldClose(window, true);
+					}
+				}
+				if (y_ndc >= -0.75f && y_ndc <= -0.6f)
+				{
+					if (x_ndc >= -1.10f && x_ndc <= -0.1f && back.visible)
+					{
+						newGame.visible = true;
+						savedGame.visible = true;
+						exit.visible = true;
+						activeTexture = texture;
+						back.visible = false;
+						enter.visible = false;
+						wman.visible = false;
+						exSave.visible = false;
+					}
+				}
+			}
+
+
+
 			glfwSwapBuffers(window); // Swap buffers
 			glfwPollEvents();        // Process events
 
 		}
 	}
 private:
+	GLuint activeTexture;
 	GLuint texture;
+	GLuint texture2;
 	GLuint VAO, VBO, EBO;
 	glm::mat4 projection;
 

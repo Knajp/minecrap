@@ -18,7 +18,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-const char* SAVEFILE = "house"; // test
+char* SAVEFILE = "house"; // test
 const std::string filePath = "saves/" + std::string(SAVEFILE) + ".json";
 //  The main game class
 class Game
@@ -72,9 +72,9 @@ public:
         sManager = ShaderManager(1); //Creating the shaderManager
 
         //Menu Part
-        Menu mainMenu(tManager.titleScreen.ID, aspect);
+        Menu mainMenu(tManager.titleScreen.ID, tManager.bgDirt.ID, aspect);
         
-        mainMenu.Loop(sManager.invertedShaderProgram, window, tManager.menuButton, aspect);
+        mainMenu.Loop(sManager.invertedShaderProgram, window, tManager.menuButton, tManager.wmanager, tManager.wsave, mode);
 
         std::cout << "afterloop\n";
         std::fstream exists(filePath);

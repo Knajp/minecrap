@@ -124,10 +124,16 @@ public:
 		atlas1 = TextureAtlas("src/texture/ta1.png");
 		titleScreen = Texture("src/texture/title.png");
 		menuButton = Texture("src/texture/button.png");
+		bgDirt = Texture("src/texture/dirt.png");
+		wmanager = Texture("src/texture/worldmgr.png");
+		wsave = Texture("src/texture/save.png");
 	}
 	TextureAtlas atlas1;
 	Texture crosshairTexture;
 	Texture titleScreen;
 	Texture menuButton;
+	Texture bgDirt;
+	Texture wmanager;
+	Texture wsave;
 };
 
