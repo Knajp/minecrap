@@ -18,7 +18,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-const char* SAVEFILE = "house"; // test
+std::string SAVEFILE = "house"; // test
 std::string filePath = "saves/" + std::string(SAVEFILE) + ".json";
 //  The main game class
 class Game
@@ -74,13 +74,15 @@ public:
         //Menu Part
         Menu mainMenu(tManager.titleScreen.ID, tManager.bgDirt.ID, aspect);
         
-        mainMenu.Loop(sManager.invertedShaderProgram, window, tManager.menuButton, tManager.wmanager, tManager.wsave, mode);
-
+        SAVEFILE = mainMenu.Loop(sManager.invertedShaderProgram, window, tManager.menuButton, tManager.wmanager, tManager.wsave, mode);
         filePath = "saves/" + std::string(SAVEFILE) + ".json";
+
         std::cout << filePath << "\n";
+
         std::fstream exists(filePath);
         if (exists.is_open())
         {
+            std::cout << "file open\n";
             std::ifstream inFile(filePath);
             std::stringstream buffer;
             buffer << inFile.rdbuf();
@@ -99,6 +101,7 @@ public:
         }
         else
         {
+            std::cout << "file created\n";
             std::ofstream File(filePath);
             File << "[\n\n]";
             File.close();

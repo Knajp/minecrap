@@ -6,7 +6,6 @@
 #include <filesystem>
 
 namespace fs = std::filesystem;
-extern const char* SAVEFILE;
 class Button
 {
 public:
@@ -384,7 +383,7 @@ public:
 
 		
 	}
-	void Loop(GLuint shaderProgram, GLFWwindow* window, Texture buttonTexture, Texture wmantext, Texture wsavetxt, const GLFWvidmode* mode)
+	std::string Loop(GLuint shaderProgram, GLFWwindow* window, Texture buttonTexture, Texture wmantext, Texture wsavetxt, const GLFWvidmode* mode)
 	{
 
 		float aspect = (float)mode->width / (float)mode->height;
@@ -464,9 +463,7 @@ public:
 						back.visible = false;
 						enter.visible = false;
 						wman.visible = false;
-						std::cout << wman.selectedWorld << "\n";
-						SAVEFILE = wman.selectedWorld.c_str();
-						break;
+						return wman.selectedWorld;
 					}
 				}
 				if (wman.visible && x_ndc >= -0.9f && x_ndc <= 0.9f)

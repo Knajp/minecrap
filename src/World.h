@@ -194,6 +194,7 @@ public:
 
         yyjson_doc* doc = yyjson_read(json, strlen(json), 0);
         if (!doc) {
+            std::cout << "JSON parse failed\n";
             return;
         }
         yyjson_val* root = yyjson_doc_get_root(doc);
