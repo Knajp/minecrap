@@ -18,8 +18,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-char* SAVEFILE = "house"; // test
-const std::string filePath = "saves/" + std::string(SAVEFILE) + ".json";
+const char* SAVEFILE = "house"; // test
+std::string filePath = "saves/" + std::string(SAVEFILE) + ".json";
 //  The main game class
 class Game
 {
@@ -76,7 +76,8 @@ public:
         
         mainMenu.Loop(sManager.invertedShaderProgram, window, tManager.menuButton, tManager.wmanager, tManager.wsave, mode);
 
-        std::cout << "afterloop\n";
+        filePath = "saves/" + std::string(SAVEFILE) + ".json";
+        std::cout << filePath << "\n";
         std::fstream exists(filePath);
         if (exists.is_open())
         {
@@ -129,7 +130,13 @@ public:
         }
         
 
-        
+        glUseProgram(sManager.invertedShaderProgram);
+
+        GLint transLoc = glGetUniformLocation(sManager.invertedShaderProgram, "xTrans");
+        glUniform1f(transLoc, 0);
+
+        GLint yLoc = glGetUniformLocation(sManager.invertedShaderProgram, "yTrans");
+        glUniform1f(yLoc, 0);
 
         
         glDisable(GL_CULL_FACE); // Transparency stuff
@@ -157,6 +164,8 @@ public:
             deltaTime = currentTime - prevTime; // Calculating the time difference
             prevTime = currentTime; // Setting prevTime to the current time for future calculations
 
+            
+
             glActiveTexture(GL_TEXTURE0); // Activating the textures
 
             glBindTexture(GL_TEXTURE_2D, tManager.crosshairTexture.ID);  // Binding the crosshair texture from the manager
@@ -171,7 +180,6 @@ public:
             camera.Inputs(window, deltaTime, planet); // Processing the inputs like keyboard input or mouse movement.
             camera.Matrix(45.0f, 0.1f, 500.0f, sManager.textureShaderProgram, "camMatrix"); // Calculating the camera matrix, crucial for 3d space
 
-            std::cout << "This should not be happening\n";
             planet->Update(camera, sManager.texmmLoc); // Updating the planet, this includes removing and adding blocks, rendering chunks if crossed
             planet->Render(); // Rendering the entire world
 

@@ -24,7 +24,7 @@
 #include <json/yyjson.h>
 #include "Texture.h"
 
-extern const std::string filePath; //test
+extern std::string filePath; //test
 
 class Camera;
 /*

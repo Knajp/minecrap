@@ -5,7 +5,8 @@
 #include <GLFW/glfw3.h>
 #include <filesystem>
 
-extern char* FILENAME;
+namespace fs = std::filesystem;
+extern const char* SAVEFILE;
 class Button
 {
 public:
@@ -125,8 +126,8 @@ private:
 class WorldSave
 {
 public:
-	WorldSave(GLuint text, float aspect, GLushort iindex)
-		:txt(text), index(iindex)
+	WorldSave(GLuint text, float aspect, GLushort iindex, std::string name)
+		:txt(text), index(iindex), worldName(name)
 	{
 		HUDvertex vertices[] =
 		{
@@ -166,7 +167,6 @@ public:
 	}
 	void Render(GLuint shaderProgram)
 	{
-		if (!visible) return;
 		glUseProgram(shaderProgram);
 
 		glActiveTexture(GL_TEXTURE0);
@@ -190,8 +190,9 @@ public:
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 	}
 	unsigned short int index;
-	bool visible = false;
+	std::string worldName;
 private:
+	
 	GLuint txt;
 	glm::mat4 projection;
 	GLuint VAO, VBO, EBO;
@@ -239,6 +240,32 @@ public:
 
 		projection = glm::ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
 	}
+	void LoadWorlds(GLuint worldTXT, float aspect)
+	{
+		fs::path dir = "saves";
+		if (fs::exists(dir) && fs::is_directory(dir)) {
+			// Iterate over the files in the directory
+			for (const auto& entry : fs::directory_iterator(dir)) {
+				if (fs::is_regular_file(entry.status())) {  // Ensure it's a file
+					// Get the filename without path and extension
+					std::string filename_without_extension = entry.path().stem().string();
+					files.push_back(filename_without_extension);  // Add it to the vector
+				}
+			}
+
+			
+		}
+		else {
+			std::cerr << "The directory does not exist or is not a valid directory." << std::endl;
+		}
+
+		int i = 0;
+		for (const auto& filename : files) {
+			WorldSave world(worldTXT, aspect, i, filename);
+			worlds.push_back(world);
+			i++;
+		}
+	}
 	void Render(GLuint shaderProgram)
 	{
 		if (!visible) return;
@@ -264,9 +291,18 @@ public:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+
+		for (auto& world : worlds)
+		{
+			world.Render(shaderProgram);
+		}
 	}
 	bool visible = false;
+	std::string selectedWorld = "";
+	std::vector<WorldSave> worlds;
 private:
+	
+	std::vector<std::string> files;
 	GLuint VAO, VBO, EBO;
 	glm::mat4 projection;
 	GLuint texture;
@@ -361,7 +397,6 @@ public:
 		Button enter(buttonTexture, aspect, 4, 0.6f);
 		enter.visible = false;
 		WorldManager wman(wmantext.ID, aspect);
-		WorldSave exSave(wsavetxt.ID, aspect, 0);
 		while (!glfwWindowShouldClose(window))
 		{
 			GLenum error = glGetError();
@@ -374,7 +409,6 @@ public:
 			back.Render(shaderProgram);
 			enter.Render(shaderProgram);
 			wman.Render(shaderProgram);
-			exSave.Render(shaderProgram);
 			if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
 			{
 				double xpos, ypos;
@@ -397,6 +431,7 @@ public:
 
 					else if (y_ndc >= -0.15f && y_ndc <= 0.0f && savedGame.visible)
 					{
+						wman.LoadWorlds(wsavetxt.ID,aspect);
 						newGame.visible = false;
 						savedGame.visible = false;
 						exit.visible = false;
@@ -404,7 +439,6 @@ public:
 						back.visible = true;
 						enter.visible = true;
 						wman.visible = true;
-						exSave.visible = true;
 					}
 
 					else if (y_ndc >= -0.35f && y_ndc <= -0.2f && exit.visible)
@@ -423,7 +457,31 @@ public:
 						back.visible = false;
 						enter.visible = false;
 						wman.visible = false;
-						exSave.visible = false;
+
+					}
+					if (x_ndc >= 0.1f && x_ndc <= 1.1f && enter.visible && wman.selectedWorld != "")
+					{
+						back.visible = false;
+						enter.visible = false;
+						wman.visible = false;
+						std::cout << wman.selectedWorld << "\n";
+						SAVEFILE = wman.selectedWorld.c_str();
+						break;
+					}
+				}
+				if (wman.visible && x_ndc >= -0.9f && x_ndc <= 0.9f)
+				{
+					if (y_ndc >= 0.5f && y_ndc < 0.8f && wman.worlds.size() > 0)
+					{
+						wman.selectedWorld = wman.worlds[0].worldName;
+					}
+					else if (y_ndc >= 0.15f && y_ndc < 0.45f && wman.worlds.size() > 1)
+					{
+						wman.selectedWorld = wman.worlds[1].worldName;
+					}
+					else if (y_ndc >= -0.2f && y_ndc < 0.1f && wman.worlds.size() > 2)
+					{
+						wman.selectedWorld = wman.worlds[2].worldName;
 					}
 				}
 			}
