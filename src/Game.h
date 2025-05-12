@@ -181,7 +181,7 @@ public:
             glUseProgram(sManager.textureShaderProgram); // Using the program used to render textures in 3D space.
 
             camera.Inputs(window, deltaTime, planet); // Processing the inputs like keyboard input or mouse movement.
-            camera.Matrix(45.0f, 0.1f, 500.0f, sManager.textureShaderProgram, "camMatrix"); // Calculating the camera matrix, crucial for 3d space
+            camera.Matrix(90.0f, 0.1f, 500.0f, sManager.textureShaderProgram, "camMatrix"); // Calculating the camera matrix, crucial for 3d space
 
             planet->Update(camera, sManager.texmmLoc); // Updating the planet, this includes removing and adding blocks, rendering chunks if crossed
             planet->Render(); // Rendering the entire world

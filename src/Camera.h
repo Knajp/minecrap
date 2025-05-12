@@ -188,9 +188,7 @@ public:
 
                 if (planet->getChunkData({ ChunkX,ChunkZ })->GetBlock(intVec.x, intVec.y, intVec.z) != AIR) // If it is not air
                 {
-                    std::cout << intVec.x << " " << intVec.y << " " << intVec.z << " " << planet->getChunkData({ ChunkX,ChunkZ })->GetBlock(intVec.x, intVec.y, intVec.z) << "\n";
                     planet->getChunkData({ ChunkX,ChunkZ })->UpdateBlock(intVec.x, intVec.y, intVec.z, AIR);
-                    std::cout << intVec.x << " " << intVec.y << " " << intVec.z << " " << planet->getChunkData({ ChunkX,ChunkZ })->GetBlock(intVec.x, intVec.y, intVec.z) << "\n";
                     break; // Remove the block and end the ray
                 }
 
@@ -295,6 +293,8 @@ public:
         
         ChunkData* chunkD = planet->getChunkData({ ChunkX, ChunkZ });
 
+        if (xinchunk >= 16) std::cout << "Over 16 in " << ChunkX << " " << ChunkZ << "\n";
+        if (xinchunk <= 0) std::cout << "Under 0\n";
 
         //Prevent going into blocks
         if ((chunkD->GetBlock(int(m_Position.x + m_Velocity.x * float(deltaTime)), yinchunk, zinchunk) == AIR ||
@@ -303,6 +303,7 @@ public:
                 std::find(billboards.begin(), billboards.end(), chunkD->GetBlock(int(m_Position.x + m_Velocity.x * float(deltaTime)), yinchunk - 1, zinchunk)) != billboards.end())) {
             m_Position.x += m_Velocity.x * float(deltaTime);
         }
+        else std::cout << "Blocked\n";
         //Prevent going into blocks
         if ((chunkD->GetBlock(xinchunk, yinchunk, int(m_Position.z + m_Velocity.z * float(deltaTime))) == AIR ||
             std::find(billboards.begin(), billboards.end(), chunkD->GetBlock(xinchunk, yinchunk, int(m_Position.z + m_Velocity.z * float(deltaTime)))) != billboards.end()) &&
@@ -310,7 +311,7 @@ public:
                 std::find(billboards.begin(), billboards.end(), chunkD->GetBlock(xinchunk, yinchunk - 1, int(m_Position.z + m_Velocity.z * float(deltaTime)))) != billboards.end())) {
             m_Position.z += m_Velocity.z * float(deltaTime);
         }
-       
+        else std::cout << "Blocked\n";
         m_Position.y += m_Velocity.y * float(deltaTime); // Apply velocity to position in the y direction
 
         float dampingFactor = 0.96f;
