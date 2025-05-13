@@ -95,6 +95,7 @@
     <ClInclude Include="src\Physics.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\World.h" />
+    <ClInclude Include="src\ft2build.h" />
     <ClInclude Include="src\stb_image.h" />
     <ClInclude Include="src\structs.h" />
   </ItemGroup>

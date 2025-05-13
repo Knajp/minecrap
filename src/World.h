@@ -203,8 +203,8 @@ public:
         yyjson_mut_val* mut_root = yyjson_mut_doc_get_root(mut_doc);
 
         yyjson_mut_val* newObj = yyjson_mut_obj(mut_doc);
-        yyjson_mut_obj_add_int(mut_doc, newObj, "locX", m_WorldPos.x);
-        yyjson_mut_obj_add_int(mut_doc, newObj, "locZ", m_WorldPos.y);
+        yyjson_mut_obj_add_int(mut_doc, newObj, "locX", (int64_t)m_WorldPos.x);
+        yyjson_mut_obj_add_int(mut_doc, newObj, "locZ", (int64_t)m_WorldPos.y);
 
         yyjson_mut_val* dataObj = yyjson_mut_obj(mut_doc);
         yyjson_mut_val* dataKey = yyjson_mut_str(mut_doc, "data");
@@ -645,8 +645,8 @@ public:
             yyjson_val* X = yyjson_obj_get(val, "locX");
             yyjson_val* Z = yyjson_obj_get(val, "locZ");
 
-            int64_t chunkX = yyjson_get_num(X);
-            int64_t chunkZ = yyjson_get_num(Z);
+            int64_t chunkX = (int64_t)yyjson_get_num(X);
+            int64_t chunkZ = (int64_t)yyjson_get_num(Z);
             if (chunkX == x && chunkZ == z)
             {
                 yyjson_val* data = yyjson_obj_get(val, "data");
@@ -658,7 +658,7 @@ public:
                     const char* keyStr = yyjson_get_str(key);
                     if (!keyStr) continue;
                     int64_t index = std::stoll(keyStr);
-                    uint16_t block = yyjson_get_num(val2);
+                    uint16_t block = (uint16_t)yyjson_get_num(val2);
                     chunkD[index] = block;
                 }
             }

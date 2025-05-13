@@ -33,13 +33,14 @@ public:
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //   Window hints (Version x., Version .x, profile)
+        glfwWindowHint(GLFW_DECORATED, GL_FALSE);
         glfwWindowHint(GLFW_SAMPLES, 3); // Implementation of mild antialiasing
 
         GLFWmonitor* monitor = glfwGetPrimaryMonitor();
         const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
         camera.Init(mode->width, mode->height, glm::vec3(0.0f, 60.0f, 1.0f));
-        window = glfwCreateWindow(mode->width, mode->height, "Minecrap", monitor, NULL); // Create a window 800x800
+        window = glfwCreateWindow(mode->width, mode->height, "Minecrap", NULL, NULL); // Create a window 800x800
 
         float aspect = (float)mode->width / (float)mode->height;
         
@@ -95,7 +96,7 @@ public:
             yyjson_val* gameObj = yyjson_arr_get(root, 0);
 
             yyjson_val* savedSeed = yyjson_obj_get(gameObj, "seed");
-            seed = yyjson_get_num(savedSeed);
+            seed = (int64_t)yyjson_get_num(savedSeed);
 
             inFile.close();
         }

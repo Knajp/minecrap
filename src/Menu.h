@@ -413,8 +413,8 @@ public:
 				double xpos, ypos;
 				glfwGetCursorPos(window, &xpos, &ypos);
 
-				float x_ndc = (2.0f * xpos) / mode->width - 1.0f;
-				float y_ndc = 1.0f - (2.0f * ypos) / mode->height;
+				float x_ndc = (2.0f * (float)xpos) / mode->width - 1.0f;
+				float y_ndc = 1.0f - (2.0f * (float)ypos) / mode->height;
 				if (x_ndc >= -0.5f && x_ndc <= 0.5f)
 				{
 					if (y_ndc >= 0.05f && y_ndc <= 0.2f && newGame.visible)
@@ -483,7 +483,7 @@ public:
 				}
 			}
 
-
+			return "";
 
 			glfwSwapBuffers(window); // Swap buffers
 			glfwPollEvents();        // Process events
