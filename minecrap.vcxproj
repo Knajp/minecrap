@@ -93,6 +93,7 @@
     <ClInclude Include="src\Menu.h" />
     <ClInclude Include="src\OpenSimplexNoise.h" />
     <ClInclude Include="src\Physics.h" />
+    <ClInclude Include="src\Text.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\World.h" />
     <ClInclude Include="src\ft2build.h" />

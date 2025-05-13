@@ -313,7 +313,6 @@ public:
 	Menu(GLuint txt, GLuint txt2, float aspect)
 		:texture(txt), texture2(txt2), activeTexture(txt)
 	{
-		std::cout << "main menu\n";
 		HUDvertex menuVertices[4] =
 		{
 			{-aspect, -1.0f, 0.0f, 0.0f},
@@ -352,8 +351,6 @@ public:
 		projection = glm::ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
 		GLint maxTextureSize;
 		glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
-		std::cout << "Max texture size: " << maxTextureSize << std::endl;
-
 	}
 	void Render(GLuint shaderProgram)
 	{
@@ -483,12 +480,13 @@ public:
 				}
 			}
 
-			return "";
+			
 
 			glfwSwapBuffers(window); // Swap buffers
 			glfwPollEvents();        // Process events
 
 		}
+		return "jews";
 	}
 private:
 	GLuint activeTexture;
