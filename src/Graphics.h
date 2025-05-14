@@ -45,9 +45,22 @@ public:
         glAttachShader(invertedShaderProgram, iFragmentShader);
         glLinkProgram(invertedShaderProgram);
 
+        GLuint textVertexShader = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(textVertexShader, 1, &textVertexShaderSource, NULL);
+        glCompileShader(textVertexShader);
+
+        GLuint textFragShader = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(textFragShader, 1, &textFragmentShaderSource, NULL);
+        glCompileShader(textFragShader);
+
+        textShaderProgram = glCreateProgram();
+        glAttachShader(textShaderProgram, textVertexShader);
+        glAttachShader(textShaderProgram, textFragShader);
+        glLinkProgram(textShaderProgram);
+
         texmmLoc = glGetUniformLocation(textureShaderProgram, "modelMatrix");
     }
-    GLuint invertedShaderProgram, textureShaderProgram;
+    GLuint invertedShaderProgram, textureShaderProgram, textShaderProgram;
     GLuint texmmLoc;
 
     bool checkShaderCompileErrors(GLuint shaderID) {
@@ -125,5 +138,34 @@ private:
         }
         FragColor = texColor;
     })";
+    const char* textVertexShaderSource = R"(
+        #version 330 core
+        layout (location = 0) in vec2 aPos;
+        layout (location = 1) in vec2 tCoord;
+        out vec2 TexCoords;
+
+        uniform mat4 projection;
+
+        void main()
+        {
+            gl_Position = projection * vec4(aPos, 0.0, 1.0);
+            TexCoords = tCoord;
+        }  
+    )";
+
+    const char* textFragmentShaderSource = R"(
+    #version 330 core
+    in vec2 tCoord;
+    out vec4 color;
+
+    uniform sampler2D text;
+    uniform vec3 textColor;
+
+    void main()
+    {    
+        vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);
+        color = vec4(textColor, 1.0) * sampled;
+    } 
+    )";
 };
 

@@ -7,7 +7,7 @@
 #include "Graphics.h"
 #include <json/yyjson.h>
 #include "Menu.h"
-
+#include "Text.h"
 //  Callback for handling GLFW errors
 void glfw_error_callback(int error, const char* description) {
     std::cerr << "GLFW Error (" << error << "): " << description << std::endl;
@@ -147,6 +147,7 @@ public:
         glEnable(GL_BLEND); // More Transparency stuff
         glEnable(GL_DEPTH_TEST); // Enabling depth tests for no weird visual errors
 
+        tRend = TextRenderer(aspect);
         crosshair = Crosshair::Crosshair(1, aspect); // Creating the crosshair using a dummy constructor
         hotbar = Hotbar::Hotbar(1, aspect); // Creating the hotbar using a dummy constructor
         planet = new Planet(5, sManager.texmmLoc, seed); //   Critical: creating the planet
@@ -179,10 +180,11 @@ public:
 
             glBindTexture(GL_TEXTURE_2D, tManager.atlas1.ID); // Binding the first texture atlas. This contains all the blocks
 
+            tRend.RenderText(sManager.textShaderProgram, "huj", 0.0f, 0.0f, 1.0f, {1.0f, 0.0f, 0.0f});
             glUseProgram(sManager.textureShaderProgram); // Using the program used to render textures in 3D space.
 
             camera.Inputs(window, deltaTime, planet); // Processing the inputs like keyboard input or mouse movement.
-            camera.Matrix(90.0f, 0.1f, 500.0f, sManager.textureShaderProgram, "camMatrix"); // Calculating the camera matrix, crucial for 3d space
+            camera.Matrix(90.0f, 0.1f, 500.0f, sManager.textureShaderProgram, "camMatrix"); // Calculating the camera matrix, crucial for 3d spac
 
             planet->Update(camera, sManager.texmmLoc); // Updating the planet, this includes removing and adding blocks, rendering chunks if crossed
             planet->Render(); // Rendering the entire world
@@ -205,5 +207,6 @@ private:
     Hotbar hotbar;
     TextureManager tManager;
     ShaderManager sManager;
+    TextRenderer tRend;
     double deltaTime, prevTime;
 };
