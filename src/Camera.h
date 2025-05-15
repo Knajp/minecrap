@@ -293,8 +293,6 @@ public:
         
         ChunkData* chunkD = planet->getChunkData({ ChunkX, ChunkZ });
 
-        if (xinchunk >= 16) std::cout << "Over 16 in " << ChunkX << " " << ChunkZ << "\n";
-        if (xinchunk <= 0) std::cout << "Under 0\n";
 
         //Prevent going into blocks
         if ((chunkD->GetBlock(int(m_Position.x + m_Velocity.x * float(deltaTime)), yinchunk, zinchunk) == AIR ||

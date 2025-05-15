@@ -26,12 +26,14 @@ public:
 			std::cerr << "Failed to init FreeType!\n";
 
 		FT_Face face;
-		if (FT_New_Face(ft, "fonts/arial.ttf", 0, &face))
+		if (FT_New_Face(ft, "src/fonts/arial.ttf", 0, &face))
 			std::cerr << "Failed to load font!\n";
 
-		FT_Set_Pixel_Sizes(face, 0, 48);
+		FT_Set_Pixel_Sizes(face, 0, 10);
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1); 
+
+        FT_Load_Char(face, 'A', FT_LOAD_RENDER);
 
         for (unsigned char c = 0; c < 128; c++)
         {
@@ -40,6 +42,8 @@ public:
                 std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
                 continue;
             }
+
+
             unsigned int texture;
             glGenTextures(1, &texture);
             glBindTexture(GL_TEXTURE_2D, texture);
@@ -76,18 +80,24 @@ public:
         glBindVertexArray(VAO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+        
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2*sizeof(float)));
+
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+        glEnableVertexAttribArray(1);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
 
-        proj = glm::ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+        proj = glm::ortho(-aspect, aspect, 1.0f, -1.0f);
 	}
     void RenderText(GLuint s, std::string text, float x, float y, float scale, glm::vec3 color)
     {
         glUseProgram(s);
         glUniform3f(glGetUniformLocation(s, "textColor"), color.x, color.y, color.z);
+        glUniformMatrix4fv(glGetUniformLocation(s, "projection"), 1, GL_FALSE, glm::value_ptr(proj));
         glActiveTexture(GL_TEXTURE0);
+        glUniform1i(glGetUniformLocation(s, "text"), 0);
         glBindVertexArray(VAO);
 
         std::string::const_iterator c;
@@ -111,6 +121,7 @@ public:
                 { xpos + w, ypos + h,   1.0f, 0.0f }
             };
             
+
             glBindTexture(GL_TEXTURE_2D, ch.TextureID);
             // update content of VBO memory
             glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -118,6 +129,9 @@ public:
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             // render quad
             glDrawArrays(GL_TRIANGLES, 0, 6);
+            GLenum error = glGetError();
+            if (error != GL_NO_ERROR)
+                std::cout << "error\n";
             // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
             x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
         }

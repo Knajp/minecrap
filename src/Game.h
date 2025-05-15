@@ -64,7 +64,7 @@ public:
 
         glClearColor(0.639f, 0.8f, 0.984f, 1.0f); // Sky colour
         
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Even more transparency stuff
+        
         glEnable(GL_TEXTURE_2D);
         glUseProgram(sManager.invertedShaderProgram);
 
@@ -145,6 +145,7 @@ public:
         
         glDisable(GL_CULL_FACE); // Transparency stuff
         glEnable(GL_BLEND); // More Transparency stuff
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Even more transparency stuff
         glEnable(GL_DEPTH_TEST); // Enabling depth tests for no weird visual errors
 
         tRend = TextRenderer(aspect);
@@ -178,9 +179,9 @@ public:
 
             hotbar.Render(sManager.invertedShaderProgram, float(camera.selectedBlock), &camera); // Rendering the hotbar
 
-            glBindTexture(GL_TEXTURE_2D, tManager.atlas1.ID); // Binding the first texture atlas. This contains all the blocks
+            
 
-            tRend.RenderText(sManager.textShaderProgram, "huj", 0.0f, 0.0f, 1.0f, {1.0f, 0.0f, 0.0f});
+            glBindTexture(GL_TEXTURE_2D, tManager.atlas1.ID); // Binding the first texture atlas. This contains all the blocks
             glUseProgram(sManager.textureShaderProgram); // Using the program used to render textures in 3D space.
 
             camera.Inputs(window, deltaTime, planet); // Processing the inputs like keyboard input or mouse movement.
@@ -188,6 +189,8 @@ public:
 
             planet->Update(camera, sManager.texmmLoc); // Updating the planet, this includes removing and adding blocks, rendering chunks if crossed
             planet->Render(); // Rendering the entire world
+
+            tRend.RenderText(sManager.textShaderProgram, "huj", 0.0f, 0.0f, 1.0f, { 1.0f, 0.0f, 0.0f });
 
             glfwPollEvents(); // Polling for events like inputs
             glfwSwapBuffers(window); // Swapping the back and front buffers

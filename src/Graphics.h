@@ -48,10 +48,12 @@ public:
         GLuint textVertexShader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(textVertexShader, 1, &textVertexShaderSource, NULL);
         glCompileShader(textVertexShader);
+        checkShaderCompileErrors(textVertexShader);
 
         GLuint textFragShader = glCreateShader(GL_FRAGMENT_SHADER);
         glShaderSource(textFragShader, 1, &textFragmentShaderSource, NULL);
         glCompileShader(textFragShader);
+        checkShaderCompileErrors(textFragShader);
 
         textShaderProgram = glCreateProgram();
         glAttachShader(textShaderProgram, textVertexShader);
@@ -163,8 +165,8 @@ private:
 
     void main()
     {    
-        vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);
-        color = vec4(textColor, 1.0) * sampled;
+        vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, tCoord).r);
+        color = vec4(1.0, 0.0, 0.0, 1.0);
     } 
     )";
 };
