@@ -9,6 +9,7 @@
 #include <glm/gtx/vector_angle.hpp>
 
 #include "World.h"
+#include "Logger.h"
 
 // The camera (player) class
 class Camera
@@ -104,7 +105,7 @@ public:
 
         
     }
-    void Inputs(GLFWwindow* window, double deltaTime, Planet* planet) // The function for processing input
+    void Inputs(GLFWwindow* window, double deltaTime, Planet* planet, Logger* logger) // The function for processing input
     {
         
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // If the W key is held
@@ -300,16 +301,19 @@ public:
             (chunkD->GetBlock(int(m_Position.x + m_Velocity.x * float(deltaTime)), yinchunk - 1, zinchunk) == AIR ||
                 std::find(billboards.begin(), billboards.end(), chunkD->GetBlock(int(m_Position.x + m_Velocity.x * float(deltaTime)), yinchunk - 1, zinchunk)) != billboards.end())) {
             m_Position.x += m_Velocity.x * float(deltaTime);
+            logger->updateLog<std::string>(NO_PASS, "Free");
         }
-        else std::cout << "Blocked\n";
+        else logger->updateLog<std::string>(NO_PASS, "BLOCKED");
         //Prevent going into blocks
         if ((chunkD->GetBlock(xinchunk, yinchunk, int(m_Position.z + m_Velocity.z * float(deltaTime))) == AIR ||
             std::find(billboards.begin(), billboards.end(), chunkD->GetBlock(xinchunk, yinchunk, int(m_Position.z + m_Velocity.z * float(deltaTime)))) != billboards.end()) &&
             (chunkD->GetBlock(xinchunk, yinchunk - 1, int(m_Position.z + m_Velocity.z * float(deltaTime))) == AIR ||
                 std::find(billboards.begin(), billboards.end(), chunkD->GetBlock(xinchunk, yinchunk - 1, int(m_Position.z + m_Velocity.z * float(deltaTime)))) != billboards.end())) {
             m_Position.z += m_Velocity.z * float(deltaTime);
+            logger->updateLog<std::string>(NO_PASS, "Free");
+
         }
-        else std::cout << "Blocked\n";
+        else logger->updateLog<std::string>(NO_PASS, "BLOCKED");
         m_Position.y += m_Velocity.y * float(deltaTime); // Apply velocity to position in the y direction
 
         float dampingFactor = 0.96f;

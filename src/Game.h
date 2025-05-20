@@ -8,6 +8,7 @@
 #include <json/yyjson.h>
 #include "Menu.h"
 #include "Text.h"
+#include "Logger.h"
 #include <string>
 #include <sstream>
 //  Callback for handling GLFW errors
@@ -151,6 +152,11 @@ public:
         glEnable(GL_DEPTH_TEST); // Enabling depth tests for no weird visual errors
 
         tRend = TextRenderer(aspect);
+        logger = Logger(&tRend);
+        logger.createLog(DEBUG);
+        logger.createLog(NO_PASS);
+        logger.createLog(OPENGL_ERROR);
+
         crosshair = Crosshair::Crosshair(1, aspect); // Creating the crosshair using a dummy constructor
         hotbar = Hotbar::Hotbar(1, aspect); // Creating the hotbar using a dummy constructor
         planet = new Planet(5, sManager.texmmLoc, seed); //   Critical: creating the planet
@@ -164,6 +170,9 @@ public:
 	}
     void GameLoop()
     {
+        logger.updateLog<std::string>(DEBUG, "gas the jews");
+        logger.updateLog<std::string>(NO_PASS, "Free");
+        logger.updateLog<std::string>(OPENGL_ERROR, "NONE");
         while (!glfwWindowShouldClose(window)) { // The game loop, continue until the window should close.
             // Clear buffers
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clearing the screen and the depth buffer
@@ -186,16 +195,13 @@ public:
             glBindTexture(GL_TEXTURE_2D, tManager.atlas1.ID); // Binding the first texture atlas. This contains all the blocks
             glUseProgram(sManager.textureShaderProgram); // Using the program used to render textures in 3D space.
 
-            camera.Inputs(window, deltaTime, planet); // Processing the inputs like keyboard input or mouse movement.
+            camera.Inputs(window, deltaTime, planet, &logger); // Processing the inputs like keyboard input or mouse movement.
             camera.Matrix(90.0f, 0.1f, 500.0f, sManager.textureShaderProgram, "camMatrix"); // Calculating the camera matrix, crucial for 3d spac
 
             planet->Update(camera, sManager.texmmLoc); // Updating the planet, this includes removing and adding blocks, rendering chunks if crossed
             planet->Render(); // Rendering the entire world
 
-            std::stringstream log;
-            log << glfwGetTime() << " - example log";
-            tRend.RenderText(sManager.textShaderProgram, log.str(), -1.5f, -0.7f, 0.001f, {1.0f, 1.0f, 1.0f});
-             
+            logger.Display(sManager.textShaderProgram);
             glfwPollEvents(); // Polling for events like inputs
             glfwSwapBuffers(window); // Swapping the back and front buffers
         }
@@ -215,5 +221,6 @@ private:
     TextureManager tManager;
     ShaderManager sManager;
     TextRenderer tRend;
+    Logger logger;
     double deltaTime, prevTime;
 };
