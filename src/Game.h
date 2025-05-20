@@ -8,6 +8,8 @@
 #include <json/yyjson.h>
 #include "Menu.h"
 #include "Text.h"
+#include <string>
+#include <sstream>
 //  Callback for handling GLFW errors
 void glfw_error_callback(int error, const char* description) {
     std::cerr << "GLFW Error (" << error << "): " << description << std::endl;
@@ -190,8 +192,10 @@ public:
             planet->Update(camera, sManager.texmmLoc); // Updating the planet, this includes removing and adding blocks, rendering chunks if crossed
             planet->Render(); // Rendering the entire world
 
-            tRend.RenderText(sManager.textShaderProgram, "huj", 0.0f, 0.0f, 1.0f, { 1.0f, 0.0f, 0.0f });
-
+            std::stringstream log;
+            log << glfwGetTime() << " - example log";
+            tRend.RenderText(sManager.textShaderProgram, log.str(), -1.5f, -0.7f, 0.001f, {1.0f, 1.0f, 1.0f});
+             
             glfwPollEvents(); // Polling for events like inputs
             glfwSwapBuffers(window); // Swapping the back and front buffers
         }

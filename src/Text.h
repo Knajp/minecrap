@@ -26,10 +26,10 @@ public:
 			std::cerr << "Failed to init FreeType!\n";
 
 		FT_Face face;
-		if (FT_New_Face(ft, "src/fonts/arial.ttf", 0, &face))
+		if (FT_New_Face(ft, "C:/Windows/Fonts/arial.ttf", 0, &face))
 			std::cerr << "Failed to load font!\n";
 
-		FT_Set_Pixel_Sizes(face, 0, 10);
+		FT_Set_Pixel_Sizes(face, 0, 48);
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1); 
 
@@ -89,7 +89,7 @@ public:
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
 
-        proj = glm::ortho(-aspect, aspect, 1.0f, -1.0f);
+        proj = glm::ortho(-aspect, aspect, -1.0f, 1.0f);
 	}
     void RenderText(GLuint s, std::string text, float x, float y, float scale, glm::vec3 color)
     {
@@ -97,7 +97,6 @@ public:
         glUniform3f(glGetUniformLocation(s, "textColor"), color.x, color.y, color.z);
         glUniformMatrix4fv(glGetUniformLocation(s, "projection"), 1, GL_FALSE, glm::value_ptr(proj));
         glActiveTexture(GL_TEXTURE0);
-        glUniform1i(glGetUniformLocation(s, "text"), 0);
         glBindVertexArray(VAO);
 
         std::string::const_iterator c;
@@ -129,9 +128,7 @@ public:
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             // render quad
             glDrawArrays(GL_TRIANGLES, 0, 6);
-            GLenum error = glGetError();
-            if (error != GL_NO_ERROR)
-                std::cout << "error\n";
+            
             // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
             x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
         }

@@ -90,6 +90,7 @@
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\Graphics.h" />
     <ClInclude Include="src\HUD.h" />
+    <ClInclude Include="src\Logger.h" />
     <ClInclude Include="src\Menu.h" />
     <ClInclude Include="src\OpenSimplexNoise.h" />
     <ClInclude Include="src\Physics.h" />
@@ -104,7 +105,6 @@
     <ClCompile Include="src\OpenSimplexNoise.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\World.cpp" />
-    <ClCompile Include="src\dubeg.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\stb_image.cpp" />

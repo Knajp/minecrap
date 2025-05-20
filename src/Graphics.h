@@ -59,6 +59,7 @@ public:
         glAttachShader(textShaderProgram, textVertexShader);
         glAttachShader(textShaderProgram, textFragShader);
         glLinkProgram(textShaderProgram);
+        CheckProgramLinking(textShaderProgram);
 
         texmmLoc = glGetUniformLocation(textureShaderProgram, "modelMatrix");
     }
@@ -78,6 +79,18 @@ public:
         }
 
         return true;
+    }
+    void CheckProgramLinking(GLuint program)
+    {
+        GLint success;
+        GLchar infoLog[1024];
+
+        glGetProgramiv(program, GL_LINK_STATUS, &success);
+        if (!success)
+        {
+            glGetProgramInfoLog(program, 1024, NULL, infoLog);
+            std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+        }
     }
 private:
     const char* tVertexShaderSource =
@@ -157,7 +170,7 @@ private:
 
     const char* textFragmentShaderSource = R"(
     #version 330 core
-    in vec2 tCoord;
+    in vec2 TexCoords;
     out vec4 color;
 
     uniform sampler2D text;
@@ -165,8 +178,8 @@ private:
 
     void main()
     {    
-        vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, tCoord).r);
-        color = vec4(1.0, 0.0, 0.0, 1.0);
+        vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);
+        color = vec4(textColor, 1.0) * sampled;
     } 
     )";
 };
