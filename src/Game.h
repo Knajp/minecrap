@@ -21,7 +21,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-std::string SAVEFILE = "house"; // test
+std::string SAVEFILE = "balls"; // test
 std::string filePath = "saves/" + std::string(SAVEFILE) + ".json";
 //  The main game class
 class Game
@@ -156,6 +156,8 @@ public:
         logger.createLog(DEBUG);
         logger.createLog(NO_PASS);
         logger.createLog(OPENGL_ERROR);
+        logger.createLog(FALLING);
+        logger.createLog(BLOCKBELOW);
 
         crosshair = Crosshair::Crosshair(1, aspect); // Creating the crosshair using a dummy constructor
         hotbar = Hotbar::Hotbar(1, aspect); // Creating the hotbar using a dummy constructor
@@ -173,6 +175,9 @@ public:
         logger.updateLog<std::string>(DEBUG, "gas the jews");
         logger.updateLog<std::string>(NO_PASS, "Free");
         logger.updateLog<std::string>(OPENGL_ERROR, "NONE");
+        logger.updateLog<uint16_t>(BLOCKBELOW, 0);
+        logger.updateLog<std::string>(FALLING, "FALSE");
+        
         while (!glfwWindowShouldClose(window)) { // The game loop, continue until the window should close.
             // Clear buffers
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clearing the screen and the depth buffer

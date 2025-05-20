@@ -6,7 +6,7 @@
 #include <glfw/glfw3.h>
 enum LOG
 {
-	NO_PASS, OPENGL_ERROR, DEBUG
+	NO_PASS, OPENGL_ERROR, DEBUG, FALLING, BLOCKABOVE, BLOCKBELOW
 };
 
 struct Log
@@ -34,7 +34,7 @@ public:
 	{
 		for (auto& l : logs)
 		{
-			if (l.type = type) return;
+			if (l.type == type) return;
 		}
 		Log newlog = {type, logs.size(), "new log"};
 		logs.push_back(newlog);
@@ -56,6 +56,9 @@ public:
 		case NO_PASS: return "NO_PASS";
 		case OPENGL_ERROR: return "OPENGL_ERROR";
 		case DEBUG: return "DEBUG";
+		case FALLING: return "FALLING";
+		case BLOCKABOVE: return "BLOCKABOVE";
+		case BLOCKBELOW: return "BLOCKBELOW";
 		default: return "Unknown";
 		}
 	}
@@ -66,10 +69,10 @@ public:
 		unsigned int i = 0;
 		for (auto& l : logs)
 		{
-			m_tRend->RenderText(shader, l.contents, -1.5f, (-0.7f + i * 0.1f), 0.001f, {1.0f, 1.0f, 1.0f});
+			m_tRend->RenderText(shader, l.contents, -1.5f, (-0.7f + i * 0.1f), 0.0012f, {1.0f, 1.0f, 1.0f});
 			i++;
+			
 		}
-		
 	}
 
 	

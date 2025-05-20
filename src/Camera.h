@@ -15,19 +15,19 @@
 class Camera
 {
 public:
-    glm::vec3 m_Velocity = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 m_Orientation = glm::vec3(0.0f, 0.0f, -1.0f);
-    glm::vec3 m_movementOrientation = glm::vec3(0.0f, 0.0f, -1.0f);
-    glm::vec3 m_Up = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 m_Velocity = glm::vec3(0.0f, 0.0f, 0.0f); // The player's velocity
+    glm::vec3 m_Orientation = glm::vec3(0.0f, 0.0f, -1.0f); // The direction the player is facing
+    glm::vec3 m_movementOrientation = glm::vec3(0.0f, 0.0f, -1.0f); // The direction the player is facing, disregarding y
+    glm::vec3 m_Up = glm::vec3(0.0f, 1.0f, 0.0f); // The upwards direction
 
-    int m_Width, m_Height;
+    int m_Width, m_Height; // The width and height of the viewport
 
-    int playerHealth = 8;
+    int playerHealth = 8; // The amount of hearts
 
-    float m_Speed = 2.0f;
-    float m_Sens = 100.0f;
-    unsigned short int selectedBlock = 0;
-    BLOCKTYPE inventory[9] = { PINKWOOL, MAGEWOOL, REDWOOL, PURPWOOL, YELLWOOL, BLUEWOOL, CYANWOOL, PLANKS, WOOD };
+    float m_Speed = 2.0f; // The players speed
+    float m_Sens = 100.0f; // The mouse sensitivity
+    unsigned short int selectedBlock = 0; // The currently selected block
+    BLOCKTYPE inventory[9] = { PINKWOOL, MAGEWOOL, REDWOOL, PURPWOOL, YELLWOOL, BLUEWOOL, CYANWOOL, PLANKS, WOOD }; // The players inventory
 
 private:
     glm::vec3 m_Position;
@@ -56,7 +56,7 @@ public:
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, uniform), 1, GL_FALSE, glm::value_ptr(projection * view)); // Send the matrix over to shader
     }
 
-    void Gravity(Planet* planet, double deltaTime) // The gravity applying function
+    void Gravity(Planet* planet, double deltaTime, Logger* logger) // The gravity applying function
     {
         int ChunkX = static_cast<int>(floor(m_Position.x / CHUNK_SIZE)); // The X coordinate of the chunk player is in
         int ChunkZ = static_cast<int>(floor(m_Position.z / CHUNK_SIZE)); // The Z coordinate of the chunk player is in
@@ -75,6 +75,7 @@ public:
                 blockbelow = i + 1; // The blockbelow value will be set to the top face of the block
 
         }
+        logger->updateLog<int>(BLOCKBELOW, blockbelow);
         if (data->GetBlock(xinchunk, int(m_Position.y), zinchunk) != AIR) // If the player's head is touching a block
         {
             m_Velocity.y *= 0.7f; // Transfer 30% of energy to block
@@ -283,7 +284,9 @@ public:
             MB2Press = false; // it is first contact
         }
 
-        Gravity(planet, deltaTime); // Apply gravity
+        Gravity(planet, deltaTime, logger); // Apply gravity
+        logger->updateLog<bool>(FALLING, inAir);
+
 
         int ChunkX = static_cast<int>(floor(m_Position.x / CHUNK_SIZE));
         int ChunkZ = static_cast<int>(floor(m_Position.z / CHUNK_SIZE)); // Chunk X and Z coordinates
