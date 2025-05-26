@@ -6,7 +6,7 @@
 #include <glfw/glfw3.h>
 enum LOG
 {
-	NO_PASSX, NO_PASSZ, OPENGL_ERROR, DEBUG, FALLING, BLOCKABOVE, BLOCKBELOW, XINCHUNK, ZINCHUNK
+	NO_PASSX, NO_PASSZ, OPENGL_ERROR, DEBUG, FALLING, BLOCKABOVE, BLOCKBELOW, XINCHUNK, ZINCHUNK, CHUNKX, CHUNKZ
 };
 
 struct Log
@@ -60,8 +60,10 @@ public:
 		case FALLING: return "FALLING";
 		case BLOCKABOVE: return "BLOCKABOVE";
 		case BLOCKBELOW: return "BLOCKBELOW";
-		case XINCHUNK: return "CHUNK_X";
-		case ZINCHUNK: return "CHUNK_Z";
+		case XINCHUNK: return "X";
+		case ZINCHUNK: return "Z";
+		case CHUNKX: return "CHUNKX";
+		case CHUNKZ: return "CHUNKZ";
 		default: return "Unknown";
 		}
 	}

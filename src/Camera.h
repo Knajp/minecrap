@@ -66,8 +66,9 @@ public:
         ChunkData* data = planet->getChunkData({ ChunkX, ChunkZ }); // Data(blocks) of the chunks the player is in
 
 
-        int blockbelow = 0; // initializing the value storing the first block below the player
-
+        static int blockbelow = 0; // initializing the value storing the first block below the player
+        int previousblockbelow = blockbelow;
+        blockbelow = 0;
         for (int i = 255; i >= 0; i--) // Looping through all the blocks in player's block column
         {
             // If the block is not higher than the player's feet and is not air nor a billboard
@@ -75,6 +76,7 @@ public:
                 blockbelow = i + 1; // The blockbelow value will be set to the top face of the block
 
         }
+        if (blockbelow == 0) blockbelow = previousblockbelow;
         logger->updateLog<int>(BLOCKBELOW, blockbelow);
         if (data->GetBlock(xinchunk, int(m_Position.y), zinchunk) != AIR) // If the player's head is touching a block
         {
@@ -295,29 +297,34 @@ public:
         int zinchunk = int(m_Position.z) - ChunkZ * CHUNK_SIZE; // Player's x and z in the chunk
         int yinchunk = int(m_Position.y); // Player's y
         
-        if (xinchunk > 15)
+        if (xinchunk + (m_Velocity.x * float(deltaTime)) > 15)
         {
             ChunkX += 1;
-            xinchunk = int(m_Position.x) - ChunkX * CHUNK_SIZE;
+            xinchunk = (m_Position.x) - ChunkX * CHUNK_SIZE;
         }
-        else if (xinchunk < 0)
+        else if (xinchunk + (m_Velocity.x * float(deltaTime)) < 0)
         {
             ChunkX -= 1;
-            xinchunk = int(m_Position.x) - ChunkX * CHUNK_SIZE;
+            xinchunk = (m_Position.x) - ChunkX * CHUNK_SIZE;
+
         }
-        if (zinchunk > 15)
+        if (zinchunk + (m_Velocity.z * float(deltaTime)) > 15)
         {
             ChunkZ += 1;
-            zinchunk = int(m_Position.z) - ChunkZ * CHUNK_SIZE;
+            zinchunk = (m_Position.z) - ChunkZ * CHUNK_SIZE;
+
         }
-        else if (zinchunk < 0)
+        else if (zinchunk + (m_Velocity.z * float(deltaTime)) < 0)
         {
             ChunkZ -= 1;
             zinchunk = int(m_Position.z) - ChunkZ * CHUNK_SIZE;
+
         }
 
         logger->updateLog(XINCHUNK, xinchunk);
         logger->updateLog(ZINCHUNK, zinchunk);
+        logger->updateLog(CHUNKX, ChunkX);
+        logger->updateLog(CHUNKZ, ChunkZ);
         ChunkData* chunkD = planet->getChunkData({ ChunkX, ChunkZ });
 
 
@@ -329,7 +336,11 @@ public:
             m_Position.x += m_Velocity.x * float(deltaTime);
             logger->updateLog<std::string>(NO_PASSX, "Free");
         }
-        else logger->updateLog<std::string>(NO_PASSX, "BLOCKED");
+        else
+        {
+            logger->updateLog<std::string>(NO_PASSX, "BLOCKED");
+            logger->updateLog<uint16_t>(DEBUG, chunkD->GetBlock(int(m_Position.x + m_Velocity.x * float(deltaTime)), yinchunk - 1, zinchunk));
+        }
         //Prevent going into blocks
         if ((chunkD->GetBlock(xinchunk, yinchunk, int(m_Position.z + m_Velocity.z * float(deltaTime))) == AIR ||
             std::find(billboards.begin(), billboards.end(), chunkD->GetBlock(xinchunk, yinchunk, int(m_Position.z + m_Velocity.z * float(deltaTime)))) != billboards.end()) &&
@@ -339,7 +350,11 @@ public:
             logger->updateLog<std::string>(NO_PASSZ, "Free");
 
         }
-        else logger->updateLog<std::string>(NO_PASSZ, "BLOCKED");
+        else 
+        {
+            logger->updateLog<std::string>(NO_PASSZ, "BLOCKED");
+            logger->updateLog<uint16_t>(DEBUG, chunkD->GetBlock(xinchunk, yinchunk - 1, int(m_Position.z + m_Velocity.z * float(deltaTime))));
+        }
         m_Position.y += m_Velocity.y * float(deltaTime); // Apply velocity to position in the y direction
 
         float dampingFactor = 0.96f;

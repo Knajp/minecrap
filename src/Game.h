@@ -20,7 +20,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
 }
-
 std::string SAVEFILE = "balls"; // test
 std::string filePath = "saves/" + std::string(SAVEFILE) + ".json";
 //  The main game class
@@ -158,6 +157,8 @@ public:
         logger.createLog(NO_PASSZ);
         logger.createLog(XINCHUNK);
         logger.createLog(ZINCHUNK);
+        logger.createLog(CHUNKX);
+        logger.createLog(CHUNKZ);
         logger.createLog(OPENGL_ERROR);
         logger.createLog(FALLING);
         logger.createLog(BLOCKBELOW);
@@ -180,6 +181,8 @@ public:
         logger.updateLog<std::string>(NO_PASSZ, "Free");
         logger.updateLog<short int>(XINCHUNK, 0);
         logger.updateLog<short int>(ZINCHUNK, 0);
+        logger.updateLog<int>(CHUNKX, 0);
+        logger.updateLog<int>(CHUNKZ, 0);
         logger.updateLog<std::string>(OPENGL_ERROR, "NONE");
         logger.updateLog<uint16_t>(BLOCKBELOW, 0);
         logger.updateLog<std::string>(FALLING, "FALSE");

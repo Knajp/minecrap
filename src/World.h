@@ -73,6 +73,7 @@ struct ChunkData
 
     uint16_t GetBlock(int x, int y, int z) const
     {
+        if (x > 15 || x < 0 || y > 256 || y < 0 || z > 16 || z < 0) return AIR;
         return chunkData[GetIndex(x, y, z)];
     }
     
