@@ -31,8 +31,8 @@ class Camera;
     TODO: 
         - find unoptimized fragments and optimize
 */
-const unsigned short int  CHUNK_SIZE = 16;
-const unsigned short int CHUNK_HEIGHT = 128;
+constexpr unsigned short int  CHUNK_SIZE = 16;
+constexpr unsigned short int CHUNK_HEIGHT = 128;
 
 
 enum BLOCKTYPE

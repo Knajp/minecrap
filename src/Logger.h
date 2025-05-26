@@ -6,7 +6,7 @@
 #include <glfw/glfw3.h>
 enum LOG
 {
-	NO_PASS, OPENGL_ERROR, DEBUG, FALLING, BLOCKABOVE, BLOCKBELOW
+	NO_PASSX, NO_PASSZ, OPENGL_ERROR, DEBUG, FALLING, BLOCKABOVE, BLOCKBELOW, XINCHUNK, ZINCHUNK
 };
 
 struct Log
@@ -36,7 +36,7 @@ public:
 		{
 			if (l.type == type) return;
 		}
-		Log newlog = {type, logs.size(), "new log"};
+		Log newlog = {type, (unsigned short)logs.size(), "new log"};
 		logs.push_back(newlog);
 	}
 
@@ -53,12 +53,15 @@ public:
 	
 	const char* logToString(LOG l) {
 		switch (l) {
-		case NO_PASS: return "NO_PASS";
+		case NO_PASSX: return "NO_PASSX";
+		case NO_PASSZ: return "NO_PASSZ";
 		case OPENGL_ERROR: return "OPENGL_ERROR";
 		case DEBUG: return "DEBUG";
 		case FALLING: return "FALLING";
 		case BLOCKABOVE: return "BLOCKABOVE";
 		case BLOCKBELOW: return "BLOCKBELOW";
+		case XINCHUNK: return "CHUNK_X";
+		case ZINCHUNK: return "CHUNK_Z";
 		default: return "Unknown";
 		}
 	}

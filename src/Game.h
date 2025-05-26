@@ -74,11 +74,11 @@ public:
         tManager = TextureManager(); // Creating the texture manager
         tManager.Init(); // This funcion exists to prevent throws
         sManager = ShaderManager(1); //Creating the shaderManager
-
+        tRend = TextRenderer(aspect);
         //Menu Part
         Menu mainMenu(tManager.titleScreen.ID, tManager.bgDirt.ID, aspect);
         
-        SAVEFILE = mainMenu.Loop(sManager.invertedShaderProgram, window, tManager.menuButton, tManager.wmanager, tManager.wsave, mode);
+        SAVEFILE = mainMenu.Loop(sManager.invertedShaderProgram, sManager.textShaderProgram, window, tManager.menuButton, tManager.wmanager, tManager.wsave, mode, &tRend);
         filePath = "saves/" + std::string(SAVEFILE) + ".json";
 
         std::cout << filePath << "\n";
@@ -151,10 +151,13 @@ public:
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Even more transparency stuff
         glEnable(GL_DEPTH_TEST); // Enabling depth tests for no weird visual errors
 
-        tRend = TextRenderer(aspect);
+        
         logger = Logger(&tRend);
         logger.createLog(DEBUG);
-        logger.createLog(NO_PASS);
+        logger.createLog(NO_PASSX);
+        logger.createLog(NO_PASSZ);
+        logger.createLog(XINCHUNK);
+        logger.createLog(ZINCHUNK);
         logger.createLog(OPENGL_ERROR);
         logger.createLog(FALLING);
         logger.createLog(BLOCKBELOW);
@@ -172,8 +175,11 @@ public:
 	}
     void GameLoop()
     {
-        logger.updateLog<std::string>(DEBUG, "gas the jews");
-        logger.updateLog<std::string>(NO_PASS, "Free");
+        logger.updateLog<std::string>(DEBUG, "bitter lemon sucks");
+        logger.updateLog<std::string>(NO_PASSX, "Free");
+        logger.updateLog<std::string>(NO_PASSZ, "Free");
+        logger.updateLog<short int>(XINCHUNK, 0);
+        logger.updateLog<short int>(ZINCHUNK, 0);
         logger.updateLog<std::string>(OPENGL_ERROR, "NONE");
         logger.updateLog<uint16_t>(BLOCKBELOW, 0);
         logger.updateLog<std::string>(FALLING, "FALSE");

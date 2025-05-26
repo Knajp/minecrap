@@ -295,6 +295,29 @@ public:
         int zinchunk = int(m_Position.z) - ChunkZ * CHUNK_SIZE; // Player's x and z in the chunk
         int yinchunk = int(m_Position.y); // Player's y
         
+        if (xinchunk > 15)
+        {
+            ChunkX += 1;
+            xinchunk = int(m_Position.x) - ChunkX * CHUNK_SIZE;
+        }
+        else if (xinchunk < 0)
+        {
+            ChunkX -= 1;
+            xinchunk = int(m_Position.x) - ChunkX * CHUNK_SIZE;
+        }
+        if (zinchunk > 15)
+        {
+            ChunkZ += 1;
+            zinchunk = int(m_Position.z) - ChunkZ * CHUNK_SIZE;
+        }
+        else if (zinchunk < 0)
+        {
+            ChunkZ -= 1;
+            zinchunk = int(m_Position.z) - ChunkZ * CHUNK_SIZE;
+        }
+
+        logger->updateLog(XINCHUNK, xinchunk);
+        logger->updateLog(ZINCHUNK, zinchunk);
         ChunkData* chunkD = planet->getChunkData({ ChunkX, ChunkZ });
 
 
@@ -304,19 +327,19 @@ public:
             (chunkD->GetBlock(int(m_Position.x + m_Velocity.x * float(deltaTime)), yinchunk - 1, zinchunk) == AIR ||
                 std::find(billboards.begin(), billboards.end(), chunkD->GetBlock(int(m_Position.x + m_Velocity.x * float(deltaTime)), yinchunk - 1, zinchunk)) != billboards.end())) {
             m_Position.x += m_Velocity.x * float(deltaTime);
-            logger->updateLog<std::string>(NO_PASS, "Free");
+            logger->updateLog<std::string>(NO_PASSX, "Free");
         }
-        else logger->updateLog<std::string>(NO_PASS, "BLOCKED");
+        else logger->updateLog<std::string>(NO_PASSX, "BLOCKED");
         //Prevent going into blocks
         if ((chunkD->GetBlock(xinchunk, yinchunk, int(m_Position.z + m_Velocity.z * float(deltaTime))) == AIR ||
             std::find(billboards.begin(), billboards.end(), chunkD->GetBlock(xinchunk, yinchunk, int(m_Position.z + m_Velocity.z * float(deltaTime)))) != billboards.end()) &&
             (chunkD->GetBlock(xinchunk, yinchunk - 1, int(m_Position.z + m_Velocity.z * float(deltaTime))) == AIR ||
                 std::find(billboards.begin(), billboards.end(), chunkD->GetBlock(xinchunk, yinchunk - 1, int(m_Position.z + m_Velocity.z * float(deltaTime)))) != billboards.end())) {
             m_Position.z += m_Velocity.z * float(deltaTime);
-            logger->updateLog<std::string>(NO_PASS, "Free");
+            logger->updateLog<std::string>(NO_PASSZ, "Free");
 
         }
-        else logger->updateLog<std::string>(NO_PASS, "BLOCKED");
+        else logger->updateLog<std::string>(NO_PASSZ, "BLOCKED");
         m_Position.y += m_Velocity.y * float(deltaTime); // Apply velocity to position in the y direction
 
         float dampingFactor = 0.96f;

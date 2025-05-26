@@ -1,0 +1,7 @@
+
+When X goes 0 - player falls under world - block below becomes 0 - possible miscalculation in Gravity()
+When X goes 15+ - player cannot pass - NOPASS_X becomes BLOCKED
+
+When Z goes either way player passes without issue
+
+Random BLOCKED status' are quite common.

@@ -4,13 +4,14 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <filesystem>
+#include "Text.h"
 
 namespace fs = std::filesystem;
 class Button
 {
 public:
-	Button(Texture texture, float aspect, int i_fromTop = 0)
-		:fromTop(i_fromTop), txt(texture)
+	Button(Texture texture, float aspect, int i_fromTop, TextRenderer* tRende)
+		:fromTop(i_fromTop), txt(texture), tRend(tRende)
 	{
 		HUDvertex vertices[] =
 		{
@@ -48,8 +49,8 @@ public:
 
 		projection = glm::ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
 	}
-	Button(Texture texture, float aspect, int i_fromTop, float xTrans)
-		:fromTop(i_fromTop), txt(texture), transX(xTrans)
+	Button(Texture texture, float aspect, int i_fromTop, float xTrans, TextRenderer* tRende)
+		:fromTop(i_fromTop), txt(texture), transX(xTrans), tRend(tRende)
 	{
 		HUDvertex vertices[] =
 		{
@@ -87,7 +88,7 @@ public:
 
 		projection = glm::ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
 	}
-	void Render(GLuint shaderProgram)
+	void Render(GLuint shaderProgram, GLuint TextProgram, std::string text)
 	{
 		if (!visible) return;
 		glUseProgram(shaderProgram);
@@ -111,6 +112,8 @@ public:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+
+		tRend->RenderText(TextProgram, text, -0.5f + transX + 0.24f, fromTop * -0.2f + 0.1f, 0.002f, { 0.0f, 0.0f, 0.0f });
 	}
 	bool visible = true;
 private:
@@ -119,6 +122,7 @@ private:
 	GLuint VAO, VBO, EBO;
 	GLint fromTop = 0;
 	GLfloat transX = 0;
+	TextRenderer* tRend;
 	
 };
 
@@ -376,21 +380,21 @@ public:
 		glBindVertexArray(VAO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL); // ERROR
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
 		
 	}
-	std::string Loop(GLuint shaderProgram, GLFWwindow* window, Texture buttonTexture, Texture wmantext, Texture wsavetxt, const GLFWvidmode* mode)
+	std::string Loop(GLuint shaderProgram, GLuint textProgram, GLFWwindow* window, Texture buttonTexture, Texture wmantext, Texture wsavetxt, const GLFWvidmode* mode, TextRenderer* tRende)
 	{
 
 		float aspect = (float)mode->width / (float)mode->height;
 
-		Button newGame(buttonTexture, aspect);
-		Button savedGame(buttonTexture, aspect, 1);
-		Button exit(buttonTexture, aspect, 2);
-		Button back(buttonTexture, aspect, 4, -0.6f);
+		Button newGame(buttonTexture, aspect, 0, tRende);
+		Button savedGame(buttonTexture, aspect, 1, tRende);
+		Button exit(buttonTexture, aspect, 2, tRende);
+		Button back(buttonTexture, aspect, 4, -0.6f, tRende);
 		back.visible = false;
-		Button enter(buttonTexture, aspect, 4, 0.6f);
+		Button enter(buttonTexture, aspect, 4, 0.6f, tRende);
 		enter.visible = false;
 		WorldManager wman(wmantext.ID, aspect);
 		while (!glfwWindowShouldClose(window))
@@ -399,11 +403,11 @@ public:
 			glClear(GL_COLOR_BUFFER_BIT);
 			
 			Render(shaderProgram);
-			newGame.Render(shaderProgram);
-			savedGame.Render(shaderProgram);
-			exit.Render(shaderProgram);
-			back.Render(shaderProgram);
-			enter.Render(shaderProgram);
+			newGame.Render(shaderProgram, textProgram, "Create New World");
+			savedGame.Render(shaderProgram, textProgram, "Load From Save");
+			exit.Render(shaderProgram, textProgram, "Exit To Desktop");
+			back.Render(shaderProgram, textProgram, "Return");
+			enter.Render(shaderProgram, textProgram, "Start Game");
 			wman.Render(shaderProgram);
 			if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
 			{
